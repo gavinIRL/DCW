@@ -29,7 +29,7 @@ class App:
         # setting title
         root.title("Helper")
         # setting window size
-        width = 200
+        width = 300
         height = 321
         screenwidth = root.winfo_screenwidth()
         screenheight = root.winfo_screenheight()
@@ -42,14 +42,14 @@ class App:
         btnSites["font"] = ftButton
         btnSites["justify"] = "center"
         btnSites["text"] = "Open a new window"
-        btnSites.place(x=0, y=230, width=200, height=30)
+        btnSites.place(x=0, y=230, width=width, height=30)
         btnSites["command"] = self.btnSites_command
 
         chkBlock = tk.Checkbutton(root)
         chkBlock["font"] = ftButton
         chkBlock["justify"] = "center"
         chkBlock["text"] = "Checkbox"
-        chkBlock.place(x=0, y=260, width=200, height=31)
+        chkBlock.place(x=0, y=260, width=width, height=31)
         chkBlock["offvalue"] = "0"
         chkBlock["onvalue"] = "1"
         chkBlock["command"] = self.chkBlock_command
@@ -59,53 +59,55 @@ class App:
         btnLog["font"] = ftButton
         btnLog["justify"] = "center"
         btnLog["text"] = "Open X"
-        btnLog.place(x=0, y=160, width=200, height=30)
+        btnLog.place(x=0, y=160, width=width, height=30)
         btnLog["command"] = self.btnLog_command
 
         lblChristmas = tk.Label(root)
         lblChristmas["font"] = ft
         lblChristmas["justify"] = "center"
-        lblChristmas["text"] = str(
-            G_Utils.days_until_christmas()) + " days until Christmas"
-        lblChristmas.place(x=0, y=125, width=200, height=30)
+        lblChristmas["text"] = "Bitcoin price at login: $" + str(
+            G_Utils.days_until_christmas())
+        lblChristmas.place(x=0, y=125, width=width, height=30)
 
         lblStart = tk.Label(root)
         lblStart["font"] = ft
         lblStart["justify"] = "center"
         lblStart["text"] = "Status"
-        lblStart.place(x=0, y=95, width=200, height=30)
+        lblStart.place(x=0, y=95, width=width, height=30)
 
         btnVPN = tk.Button(root)
         btnVPN["font"] = ftButton
         btnVPN["justify"] = "center"
         btnVPN["text"] = "Start X"
-        btnVPN.place(x=0, y=195, width=200, height=30)
+        btnVPN.place(x=0, y=195, width=width, height=30)
         btnVPN["command"] = self.btnVPN_command
 
         btnClose = tk.Button(root)
         btnClose["font"] = ftButton
         btnClose["justify"] = "center"
         btnClose["text"] = "Close"
-        btnClose.place(x=0, y=290, width=200, height=30)
+        btnClose.place(x=0, y=290, width=width, height=30)
         btnClose["command"] = self.btnClose_command
 
         self.lblVPNStatus = tk.Label(root)
         self.lblVPNStatus["font"] = ftStatus
         self.lblVPNStatus["justify"] = "center"
-        self.lblVPNStatus["text"] = "Status"
-        self.lblVPNStatus.place(x=0, y=5, width=200, height=30)
+        self.lblVPNStatus["text"] = "User Status: " + \
+            str(G_Utils.checkSettingsFileExists())
+        self.lblVPNStatus.place(x=0, y=5, width=width, height=30)
 
         self.lblBlockStatus = tk.Label(root)
         self.lblBlockStatus["font"] = ftStatus
         self.lblBlockStatus["justify"] = "center"
-        self.lblBlockStatus["text"] = "Status"
-        self.lblBlockStatus.place(x=0, y=35, width=200, height=30)
+        self.lblBlockStatus["text"] = "User Net Worth: " + \
+            str(G_Utils.getNetWorth())
+        self.lblBlockStatus.place(x=0, y=35, width=width, height=30)
 
         lblBirthday = tk.Label(root)
         lblBirthday["font"] = ft
         lblBirthday["justify"] = "center"
         lblBirthday["text"] = "Status"
-        lblBirthday.place(x=0, y=65, width=200, height=30)
+        lblBirthday.place(x=0, y=65, width=width, height=30)
 
     def btnSites_command(self):
         AnalysisWindow()
