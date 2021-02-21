@@ -1,0 +1,5 @@
+__pycache__/
+*.manifest
+*.spec
+# This is the settings file extension that will contain the api key and other user information
+*.cfg
