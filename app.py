@@ -5,6 +5,17 @@ from datetime import datetime
 import os
 
 
+class AnalysisWindow(tk.Toplevel):
+
+    def __init__(self, master=None):
+
+        super().__init__(master=master)
+        self.title("Analysis Window")
+        self.geometry("600x600")
+        label = tk.Label(self, text="Status")
+        label.pack()
+
+
 class App:
 
     def __init__(self, root):
@@ -30,7 +41,7 @@ class App:
         btnSites = tk.Button(root)
         btnSites["font"] = ftButton
         btnSites["justify"] = "center"
-        btnSites["text"] = "Open X"
+        btnSites["text"] = "Open a new window"
         btnSites.place(x=0, y=230, width=200, height=30)
         btnSites["command"] = self.btnSites_command
 
@@ -97,7 +108,7 @@ class App:
         lblBirthday.place(x=0, y=65, width=200, height=30)
 
     def btnSites_command(self):
-        pass
+        AnalysisWindow()
 
     def chkBlock_command(self):
         if self.status_block.get():
