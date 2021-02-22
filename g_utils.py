@@ -80,19 +80,24 @@ class G_Utils:
         # This will set the default exchange in the settings file
         pass
 
-    def getMarkets(key, exch):
+    def getCoinList(key, exch):
         if not key:
             # if it isn't valid print an error message
-            print("Invalid settings file")
-        else:
-            pass
+            return False
+        url = "https://api.nomics.com/v1/markets?key=" + \
+            key+"&ids=" + "&exchange="+exch+"&quote=BTC"
+        raw_data = urllib.request.urlopen(url).read()
+        data = json.loads(raw_data)
+        currencyList = []
+        for currency in data:
+            currencyList.append(currency["base"])
+        return sorted(list(set(currencyList)))
 
         # then do some sorting out the output
 
     def checkSettingsFileExists():
-        filename = "settings.cfg"
         # check if file exists
-        if os.path.isfile(filename):
+        if os.path.isfile("settings.cfg"):
             # Need to check if the file is valid first
             # If valid then return setup complete
             return "Setup Complete"
@@ -126,5 +131,5 @@ class G_Utils:
 if __name__ == "__main__":
     # playground for testing
     # G_Utils.days_until_christmas()
-    G_Utils.getCoinPrice("BTC", G_Utils.getAPIKey(), "1h")
+    print(G_Utils.getCoinList(G_Utils.getAPIKey(), "binance"))
     pass
