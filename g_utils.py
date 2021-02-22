@@ -2,10 +2,9 @@ import os
 import time
 import subprocess
 import webbrowser
-import sys
 from datetime import datetime
-from nomics import Nomics
-import nomics
+import json
+import urllib.request
 
 
 class G_Utils:
@@ -81,24 +80,12 @@ class G_Utils:
         # This will set the default exchange in the settings file
         pass
 
-    def getRates(key):
-        if not key:
-            # if it isn't valid print an error message
-            print("Invalid settings file")
-        else:
-            nomics = Nomics(key)
-            return nomics.ExchangeRates.get_rates()
-
-        # then do some sorting of the output
-
     def getMarkets(key, exch):
         if not key:
             # if it isn't valid print an error message
             print("Invalid settings file")
         else:
-            nomics = Nomics(key)
-            markets = nomics.Markets.get_markets(exchange=exch)
-            print(markets)
+            pass
 
         # then do some sorting out the output
 
@@ -119,10 +106,25 @@ class G_Utils:
         # Placeholder for now
         return 1000
 
+    def getCoinPrice(coin, key, interval):
+        url = "https://api.nomics.com/v1/currencies/ticker?key="+key+"&ids=" + \
+            coin+"&interval="+interval+"&convert=USD&per-page=100&page=1"
+        raw_data = urllib.request.urlopen(url).read()
+        data = json.loads(raw_data)
+        for currency in data:
+            print("ID: "+currency["id"])
+            print("Price:"+currency["price"])
+            print("Time:"+currency["price_timestamp"])
+            hourdata = currency["1h"]
+            print(hourdata)
+            print("Price Change 1hr: " +
+                  str(100*float(hourdata["price_change_pct"]))+"%")
+            print("Volume Change 1hr: " +
+                  str(100*float(hourdata["volume_change_pct"]))+"%")
+
 
 if __name__ == "__main__":
     # playground for testing
     # G_Utils.days_until_christmas()
-    # print(G_Utils.getMarkets(G_Utils.getAPIKey(), "binance"))
-    print(G_Utils.getRates(G_Utils.getAPIKey()))
+    G_Utils.getCoinPrice("BTC", G_Utils.getAPIKey(), "1h")
     pass
