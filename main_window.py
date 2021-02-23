@@ -158,10 +158,11 @@ if __name__ == "__main__":
     def updatePrices():
         # Perform an update of the information
         # These are all either placeholder or call placeholder functions
-        bitcoin_price = G_Utils.getCoinPrice(G_Utils.getAPIKey(), "BTC", "1h")
+        bitcoin_price = G_Utils.get_coin_price(
+            G_Utils.get_API_key(), "BTC", "1h")
         bitcoin_price_yesterday = 12
         net_worth_increase = (
-            (float(G_Utils.getNetWorth)/float(G_Utils.getNetWorthOld))*100)-1
+            (float(G_Utils.get_net_worth("now", "BTC"))/float(G_Utils.get_net_worth("yesterday", "BTC")))*100)-1
 
         root.after(30000, updatePrices)
     root.after(30, updatePrices)

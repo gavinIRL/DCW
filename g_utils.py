@@ -59,9 +59,47 @@ class G_Utils:
         else:
             return "Setup Incomplete"
 
+    def call_api(suffix):
+        # Highly condensed function which returns the json data from nomics
+        return json.loads(urllib.request.urlopen("https://api.nomics.com/v1/"+suffix).read())
+
     # All of the get functions related to crypto
 
-    def getAPIKey():
+    def get_all_prices(key=False):
+        # Uses a deprecated api call to grab price data for all currencies available
+        url = "https://api.nomics.com/v1/prices?key=" + key
+        raw_data = urllib.request.urlopen(url).read()
+        data = json.loads(raw_data)
+        list_currencies = []
+        list_prices = []
+        for currency in data:
+            list_currencies.append(currency["currency"])
+            list_prices.append(currency["price"])
+        if len(list_prices) == len(list_currencies):
+            return dict(zip(list_currencies, list_prices))
+        else:
+            return False
+
+    def get_all_prices_old(key=False, start_time="T00%3A00%3A00Z", start_date="2021-02-12", end_time="T00%3A00%3A00Z", end_date="2021-02-14"):
+        # Uses a deprecated api call to grab price data for all currencies
+        # At a specific time period in the past
+        url = "https://api.nomics.com/v1/prices?key=" + key + "&start=" + \
+            start_date + start_time + "&end=" + end_date + end_time
+        raw_data = urllib.request.urlopen(url).read()
+        data = json.loads(raw_data)
+        list_currencies = []
+        list_open = []
+        list_close = []
+        for currency in data:
+            list_currencies.append(currency["currency"])
+            list_open.append(currency["open"])
+            list_close.append(currency["close"])
+        if len(list_open) == len(list_currencies):
+            return dict(zip(list_currencies, list_open, list_close))
+        else:
+            return False
+
+    def get_API_key():
         filename = "settings.cfg"
         # check if file exists otherwise create new file
         if os.path.isfile(filename):
@@ -86,11 +124,11 @@ class G_Utils:
             # and finally return the key
             return key
 
-    def getDefaultExchange():
+    def get_default_exchange():
         # This will grab the default exchange from the settings file
         pass
 
-    def getCoinList(key, exch):
+    def get_coin_list(key, exch):
         if not key:
             # if it isn't valid print an error message
             return False
@@ -105,26 +143,20 @@ class G_Utils:
 
         # then do some sorting out the output
 
-    def getStartHighLowCurrent(key, coin, interval):
+    def get_high_low_current(key, coin, interval):
         # placholder for now
         # Format of data is High/Low/Current
         data = ["297", "316", "309"]
         return data
 
-    def getNetWorthOld(datetime, currencies):
+    def get_net_worth(datetime, currencies):
         # This will get the approximate net worth of the user
         # Against previous exchange rates
         # Typically 24 hours
         # Placeholder for now
         return 900
 
-    def getNetWorth(currencies):
-        # This will get the approximate net worth of the user
-        # Against the latest exchange rates
-        # Placeholder for now
-        return 1000
-
-    def getCoinPrice(key=False, coin="BTC", interval="1h"):
+    def get_coin_price(key=False, coin="BTC", interval="1h"):
         if not key:
             url = "https://api.nomics.com/v1/currencies/ticker?key="+key+"&ids=" + \
                 coin+"&interval="+interval+"&convert=USD&per-page=100&page=1"
@@ -144,11 +176,11 @@ class G_Utils:
         else:
             return 191
 
-    def getCoinPriceOld(key=False, coin="BTC", time="T00%3A00%3A00Z", date="2021-02-12"):
+    def get_coin_price_old(key=False, coin="BTC", time="T00%3A00%3A00Z", date="2021-02-12"):
         # Placeholder for now
         return 181
 
-    def getSparkline(key=False, coin="BTC", start_time="T00%3A00%3A00Z", start_date="2021-02-12", end_time="T00%3A00%3A00Z", end_date="2021-02-14"):
+    def get_sparkline(key=False, coin="BTC", start_time="T00%3A00%3A00Z", start_date="2021-02-12", end_time="T00%3A00%3A00Z", end_date="2021-02-14"):
         if not key:
             # Placeholder for now
             url = "https://api.nomics.com/v1/currencies/sparkline?key="+key+"&ids=" + \
@@ -175,5 +207,5 @@ class G_Utils:
 if __name__ == "__main__":
     # playground for testing
     # G_Utils.days_until_christmas()
-    print(G_Utils.getCoinList(G_Utils.getAPIKey(), "binance"))
+    print(G_Utils.get_coin_list(G_Utils.get_API_key(), "binance"))
     pass
