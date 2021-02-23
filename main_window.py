@@ -4,6 +4,7 @@ from g_utils import G_Utils
 from analysis_window import AnalysisWindow
 from wallet_window import WalletWindow
 from settings_window import SettingsWindow
+from alerts_window import AlertsWindow
 
 
 class MainWindow():
@@ -14,6 +15,7 @@ class MainWindow():
         self.newWindowAnalysis = None
         self.newWindowWallet = None
         self.newWindowSettings = None
+        self.newWindowAlerts = None
         # set fonts
         ftButton = tkFont.Font(family='Times', size=12)
         ft = tkFont.Font(family='Times', size=12)
@@ -65,12 +67,12 @@ class MainWindow():
         self.btnWallet.place(x=0, y=195, width=width, height=30)
         self.btnWallet["command"] = self.btnWallet_command
 
-        btnClose = tk.Button(self.root)
-        btnClose["font"] = ftButton
-        btnClose["justify"] = "center"
-        btnClose["text"] = "Close"
-        btnClose.place(x=0, y=290, width=width, height=30)
-        btnClose["command"] = self.btnClose_command
+        self.btnAlerts = tk.Button(self.root)
+        self.btnAlerts["font"] = ftButton
+        self.btnAlerts["justify"] = "center"
+        self.btnAlerts["text"] = "Alerts"
+        self.btnAlerts.place(x=0, y=290, width=width, height=30)
+        self.btnAlerts["command"] = self.btnAlerts_command
 
         self.lblVPNStatus = tk.Label(self.root)
         self.lblVPNStatus["font"] = ftStatus
@@ -105,6 +107,10 @@ class MainWindow():
         self.newWindowSettings.destroy()
         self.btnSettings["state"] = "normal"
 
+    def destroyAlerts(self):
+        self.newWindowAlerts.destroy()
+        self.btnAlerts["state"] = "normal"
+
     def new_window(self, _class):
         if _class is WalletWindow:
             self.btnWallet["state"] = "disabled"
@@ -124,13 +130,18 @@ class MainWindow():
             self.newWindowSettings.protocol(
                 "WM_DELETE_WINDOW", self.destroySettings)
             _class(self, self.newWindowSettings)
+        if _class is AlertsWindow:
+            self.btnAlerts["state"] = "disabled"
+            self.newWindowAlerts = tk.Toplevel(self.root)
+            self.newWindowAlerts.protocol(
+                "WM_DELETE_WINDOW", self.destroyAlerts)
+            _class(self, self.newWindowAlerts)
 
     def btnSettings_command(self):
         self.new_window(SettingsWindow)
 
-    def btnClose_command(self):
-        # then close
-        self.root.destroy()
+    def btnAlerts_command(self):
+        self.new_window(AlertsWindow)
 
     def btnAnalysis_command(self):
         self.new_window(AnalysisWindow)
