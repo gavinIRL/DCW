@@ -47,6 +47,20 @@ class G_Utils:
         delta = now-date
         return delta.days
 
+    # All of the non-set/get functions related to crypto
+
+    def checkSettingsFileExists():
+        # check if file exists
+        if os.path.isfile("settings.cfg"):
+            # Need to check if the file is valid first
+            # If valid then return setup complete
+            return "Setup Complete"
+            # Otherwise return invalid settings file
+        else:
+            return "Setup Incomplete"
+
+    # All of the get functions related to crypto
+
     def getAPIKey():
         filename = "settings.cfg"
         # check if file exists otherwise create new file
@@ -76,10 +90,6 @@ class G_Utils:
         # This will grab the default exchange from the settings file
         pass
 
-    def setDefaultExchange():
-        # This will set the default exchange in the settings file
-        pass
-
     def getCoinList(key, exch):
         if not key:
             # if it isn't valid print an error message
@@ -95,37 +105,71 @@ class G_Utils:
 
         # then do some sorting out the output
 
-    def checkSettingsFileExists():
-        # check if file exists
-        if os.path.isfile("settings.cfg"):
-            # Need to check if the file is valid first
-            # If valid then return setup complete
-            return "Setup Complete"
-            # Otherwise return invalid settings file
-        else:
-            return "Setup Incomplete"
+    def getStartHighLowCurrent(key, coin, interval):
+        # placholder for now
+        # Format of data is High/Low/Current
+        data = ["297", "316", "309"]
+        return data
 
-    def getNetWorth():
+    def getNetWorthOld(datetime, currencies):
+        # This will get the approximate net worth of the user
+        # Against previous exchange rates
+        # Typically 24 hours
+        # Placeholder for now
+        return 900
+
+    def getNetWorth(currencies):
         # This will get the approximate net worth of the user
         # Against the latest exchange rates
         # Placeholder for now
         return 1000
 
-    def getCoinPrice(coin, key, interval):
-        url = "https://api.nomics.com/v1/currencies/ticker?key="+key+"&ids=" + \
-            coin+"&interval="+interval+"&convert=USD&per-page=100&page=1"
-        raw_data = urllib.request.urlopen(url).read()
-        data = json.loads(raw_data)
-        for currency in data:
-            print("ID: "+currency["id"])
-            print("Price:"+currency["price"])
-            print("Time:"+currency["price_timestamp"])
-            hourdata = currency["1h"]
-            print(hourdata)
-            print("Price Change 1hr: " +
-                  str(100*float(hourdata["price_change_pct"]))+"%")
-            print("Volume Change 1hr: " +
-                  str(100*float(hourdata["volume_change_pct"]))+"%")
+    def getCoinPrice(key=False, coin="BTC", interval="1h"):
+        if not key:
+            url = "https://api.nomics.com/v1/currencies/ticker?key="+key+"&ids=" + \
+                coin+"&interval="+interval+"&convert=USD&per-page=100&page=1"
+            raw_data = urllib.request.urlopen(url).read()
+            data = json.loads(raw_data)
+            for currency in data:
+                print("ID: "+currency["id"])
+                print("Price:"+currency["price"])
+                print("Time:"+currency["price_timestamp"])
+                hourdata = currency["1h"]
+                print(hourdata)
+                print("Price Change 1hr: " +
+                      str(100*float(hourdata["price_change_pct"]))+"%")
+                print("Volume Change 1hr: " +
+                      str(100*float(hourdata["volume_change_pct"]))+"%")
+            return 191.75
+        else:
+            return 191
+
+    def getCoinPriceOld(key=False, coin="BTC", time="T00%3A00%3A00Z", date="2021-02-12"):
+        # Placeholder for now
+        return 181
+
+    def getSparkline(key=False, coin="BTC", start_time="T00%3A00%3A00Z", start_date="2021-02-12", end_time="T00%3A00%3A00Z", end_date="2021-02-14"):
+        if not key:
+            # Placeholder for now
+            url = "https://api.nomics.com/v1/currencies/sparkline?key="+key+"&ids=" + \
+                coin + "&start=" + start_date + start_time + "&end=" + end_date + end_time
+            # Format will be a 2D list with dates in first row and values in second
+            raw_data = urllib.request.urlopen(url).read()
+            data = json.loads(raw_data)
+            for currency in data:
+                # grab the relevant values
+                pass
+            return_data = [["2021-02-12", "2021-02-13",
+                            "2021-02-14"], ["154", "155", "156"]]
+            return return_data
+        else:
+            return False
+
+    # All of the set functions related to crypto
+
+    def setDefaultExchange():
+        # This will set the default exchange in the settings file
+        pass
 
 
 if __name__ == "__main__":

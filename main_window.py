@@ -155,10 +155,15 @@ if __name__ == "__main__":
     root.attributes('-toolwindow', True)
     MainWindow = MainWindow(root)
 
-    def checkPrices():
+    def updatePrices():
         # Perform an update of the information
-        pass
-        root.after(30000, checkPrices)
-    root.after(30, checkPrices)
+        # These are all either placeholder or call placeholder functions
+        bitcoin_price = G_Utils.getCoinPrice(G_Utils.getAPIKey(), "BTC", "1h")
+        bitcoin_price_yesterday = 12
+        net_worth_increase = (
+            (float(G_Utils.getNetWorth)/float(G_Utils.getNetWorthOld))*100)-1
+
+        root.after(30000, updatePrices)
+    root.after(30, updatePrices)
     root.wm_attributes('-topmost', True)
     root.mainloop()
