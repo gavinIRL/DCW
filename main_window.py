@@ -12,141 +12,141 @@ class MainWindow():
     def __init__(self, root):
         self.root = root
         # set variables
-        self.newWindowAnalysis = None
-        self.newWindowWallet = None
-        self.newWindowSettings = None
-        self.newWindowAlerts = None
+        self.new_window_analysis = None
+        self.new_window_wallet = None
+        self.new_window_settings = None
+        self.new_window_alerts = None
         # set fonts
-        ftButton = tkFont.Font(family='Times', size=12)
+        font_button = tkFont.Font(family='Times', size=12)
         ft = tkFont.Font(family='Times', size=12)
-        ftStatus = tkFont.Font(family='Times', size=12, weight="bold")
+        font_status = tkFont.Font(family='Times', size=12, weight="bold")
         # setting title
         self.root.title("DCW Main Menu")
         # setting window size
         width = 300
         height = 321
-        screenwidth = self.root.winfo_screenwidth()
-        screenheight = self.root.winfo_screenheight()
+        width_screen = self.root.winfo_width_screen()
+        height_screen = self.root.winfo_height_screen()
         alignstr = '%dx%d+%d+%d' % (width, height,
-                                    (screenwidth - width) / 2, (screenheight - height) / 2)
+                                    (width_screen - width) / 2, (height_screen - height) / 2)
         self.root.geometry(alignstr)
         self.root.resizable(width=False, height=False)
 
-        self.btnAnalysis = tk.Button(self.root)
-        self.btnAnalysis["font"] = ftButton
-        self.btnAnalysis["justify"] = "center"
-        self.btnAnalysis["text"] = "Open Analysis Window"
-        self.btnAnalysis.place(x=0, y=230, width=width, height=30)
-        self.btnAnalysis["command"] = self.btnAnalysis_command
+        self.btn_analysis = tk.Button(self.root)
+        self.btn_analysis["font"] = font_button
+        self.btn_analysis["justify"] = "center"
+        self.btn_analysis["text"] = "Open Analysis Window"
+        self.btn_analysis.place(x=0, y=230, width=width, height=30)
+        self.btn_analysis["command"] = self.btn_analysis_command
 
-        self.btnSettings = tk.Button(self.root)
-        self.btnSettings["font"] = ftButton
-        self.btnSettings["justify"] = "center"
-        self.btnSettings["text"] = "Open Settings"
-        self.btnSettings.place(x=0, y=160, width=width, height=30)
-        self.btnSettings["command"] = self.btnSettings_command
+        self.btn_settings = tk.Button(self.root)
+        self.btn_settings["font"] = font_button
+        self.btn_settings["justify"] = "center"
+        self.btn_settings["text"] = "Open Settings"
+        self.btn_settings.place(x=0, y=160, width=width, height=30)
+        self.btn_settings["command"] = self.btn_settings_command
 
-        lblBitcoinPrice = tk.Label(self.root)
-        lblBitcoinPrice["font"] = ft
-        lblBitcoinPrice["justify"] = "center"
+        self.lbl_bitcoin_price = tk.Label(self.root)
+        self.lbl_bitcoin_price["font"] = ft
+        self.lbl_bitcoin_price["justify"] = "center"
         # This gets updated later, but a placeholder for startup
-        lblBitcoinPrice["text"] = "Bitcoin price at login: $190"
-        lblBitcoinPrice.place(x=0, y=125, width=width, height=30)
+        self.lbl_bitcoin_price["text"] = "Bitcoin price at login: $190"
+        self.lbl_bitcoin_price.place(x=0, y=125, width=width, height=30)
 
-        lblStart = tk.Label(self.root)
-        lblStart["font"] = ft
-        lblStart["justify"] = "center"
+        self.lbl_bitcoin_hilo = tk.Label(self.root)
+        self.lbl_bitcoin_hilo["font"] = ft
+        self.lbl_bitcoin_hilo["justify"] = "center"
         # This gets updated later, but a placeholder for startup
-        lblStart["text"] = "Bitcoin: 24hr high $200 | low $180"
-        lblStart.place(x=0, y=95, width=width, height=30)
+        self.lbl_bitcoin_hilo["text"] = "Bitcoin: 24hr high $200 | low $180"
+        self.lbl_bitcoin_hilo.place(x=0, y=95, width=width, height=30)
 
-        self.btnWallet = tk.Button(self.root)
-        self.btnWallet["font"] = ftButton
-        self.btnWallet["justify"] = "center"
-        self.btnWallet["text"] = "Open Wallet"
-        self.btnWallet.place(x=0, y=195, width=width, height=30)
-        self.btnWallet["command"] = self.btnWallet_command
+        self.btn_wallet = tk.Button(self.root)
+        self.btn_wallet["font"] = font_button
+        self.btn_wallet["justify"] = "center"
+        self.btn_wallet["text"] = "Open Wallet"
+        self.btn_wallet.place(x=0, y=195, width=width, height=30)
+        self.btn_wallet["command"] = self.btn_wallet_command
 
-        self.btnAlerts = tk.Button(self.root)
-        self.btnAlerts["font"] = ftButton
-        self.btnAlerts["justify"] = "center"
-        self.btnAlerts["text"] = "Alerts"
-        self.btnAlerts.place(x=0, y=290, width=width, height=30)
-        self.btnAlerts["command"] = self.btnAlerts_command
+        self.btn_alerts = tk.Button(self.root)
+        self.btn_alerts["font"] = font_button
+        self.btn_alerts["justify"] = "center"
+        self.btn_alerts["text"] = "Alerts"
+        self.btn_alerts.place(x=0, y=290, width=width, height=30)
+        self.btn_alerts["command"] = self.btn_alerts_command
 
-        self.lblVPNStatus = tk.Label(self.root)
-        self.lblVPNStatus["font"] = ftStatus
-        self.lblVPNStatus["justify"] = "center"
-        self.lblVPNStatus["text"] = "User Status: " + \
+        self.lbl_user_status = tk.Label(self.root)
+        self.lbl_user_status["font"] = font_status
+        self.lbl_user_status["justify"] = "center"
+        self.lbl_user_status["text"] = "User Status: " + \
             str(G_Utils.checkSettingsFileExists())
-        self.lblVPNStatus.place(x=0, y=5, width=width, height=30)
+        self.lbl_user_status.place(x=0, y=5, width=width, height=30)
 
-        self.lblBlockStatus = tk.Label(self.root)
-        self.lblBlockStatus["font"] = ftStatus
-        self.lblBlockStatus["justify"] = "center"
+        self.lbl_net_worth = tk.Label(self.root)
+        self.lbl_net_worth["font"] = font_status
+        self.lbl_net_worth["justify"] = "center"
         # This gets updated later, but a placeholder for startup
-        self.lblBlockStatus["text"] = "User Net Worth: $1000"
-        self.lblBlockStatus.place(x=0, y=35, width=width, height=30)
+        self.lbl_net_worth["text"] = "User Net Worth: $1000"
+        self.lbl_net_worth.place(x=0, y=35, width=width, height=30)
 
-        lblBirthday = tk.Label(self.root)
-        lblBirthday["font"] = ft
-        lblBirthday["justify"] = "center"
+        self.lbl_net_worth_incr = tk.Label(self.root)
+        self.lbl_net_worth_incr["font"] = ft
+        self.lbl_net_worth_incr["justify"] = "center"
         # This gets updated later, but a placeholder for startup
-        lblBirthday["text"] = "User 24hr Net Worth Increase: 11%"
-        lblBirthday.place(x=0, y=65, width=width, height=30)
+        self.lbl_net_worth_incr["text"] = "User 24hr Net Worth Increase: 11%"
+        self.lbl_net_worth_incr.place(x=0, y=65, width=width, height=30)
 
-    def destroyAnalysis(self):
-        self.newWindowAnalysis.destroy()
-        self.btnAnalysis["state"] = "normal"
+    def destroy_analysis(self):
+        self.new_window_analysis.destroy()
+        self.btn_analysis["state"] = "normal"
 
-    def destroyWallet(self):
-        self.newWindowWallet.destroy()
-        self.btnWallet["state"] = "normal"
+    def destroy_wallet(self):
+        self.new_window_wallet.destroy()
+        self.btn_wallet["state"] = "normal"
 
-    def destroySettings(self):
-        self.newWindowSettings.destroy()
-        self.btnSettings["state"] = "normal"
+    def destroy_settings(self):
+        self.new_window_settings.destroy()
+        self.btn_settings["state"] = "normal"
 
-    def destroyAlerts(self):
-        self.newWindowAlerts.destroy()
-        self.btnAlerts["state"] = "normal"
+    def destroy_alerts(self):
+        self.new_window_alerts.destroy()
+        self.btn_alerts["state"] = "normal"
 
     def new_window(self, _class):
         if _class is WalletWindow:
-            self.btnWallet["state"] = "disabled"
-            self.newWindowWallet = tk.Toplevel(self.root)
-            self.newWindowWallet.protocol(
-                "WM_DELETE_WINDOW", self.destroyWallet)
-            _class(self, self.newWindowWallet)
+            self.btn_wallet["state"] = "disabled"
+            self.new_window_wallet = tk.Toplevel(self.root)
+            self.new_window_wallet.protocol(
+                "WM_DELETE_WINDOW", self.destroy_wallet)
+            _class(self, self.new_window_wallet)
         if _class is AnalysisWindow:
-            self.btnAnalysis["state"] = "disabled"
-            self.newWindowAnalysis = tk.Toplevel(self.root)
-            self.newWindowAnalysis.protocol(
-                "WM_DELETE_WINDOW", self.destroyAnalysis)
-            _class(self, self.newWindowAnalysis)
+            self.btn_analysis["state"] = "disabled"
+            self.new_window_analysis = tk.Toplevel(self.root)
+            self.new_window_analysis.protocol(
+                "WM_DELETE_WINDOW", self.destroy_analysis)
+            _class(self, self.new_window_analysis)
         if _class is SettingsWindow:
-            self.btnSettings["state"] = "disabled"
-            self.newWindowSettings = tk.Toplevel(self.root)
-            self.newWindowSettings.protocol(
-                "WM_DELETE_WINDOW", self.destroySettings)
-            _class(self, self.newWindowSettings)
+            self.btn_settings["state"] = "disabled"
+            self.new_window_settings = tk.Toplevel(self.root)
+            self.new_window_settings.protocol(
+                "WM_DELETE_WINDOW", self.destroy_settings)
+            _class(self, self.new_window_settings)
         if _class is AlertsWindow:
-            self.btnAlerts["state"] = "disabled"
-            self.newWindowAlerts = tk.Toplevel(self.root)
-            self.newWindowAlerts.protocol(
-                "WM_DELETE_WINDOW", self.destroyAlerts)
-            _class(self, self.newWindowAlerts)
+            self.btn_alerts["state"] = "disabled"
+            self.new_window_alerts = tk.Toplevel(self.root)
+            self.new_window_alerts.protocol(
+                "WM_DELETE_WINDOW", self.destroy_alerts)
+            _class(self, self.new_window_alerts)
 
-    def btnSettings_command(self):
+    def btn_settings_command(self):
         self.new_window(SettingsWindow)
 
-    def btnAlerts_command(self):
+    def btn_alerts_command(self):
         self.new_window(AlertsWindow)
 
-    def btnAnalysis_command(self):
+    def btn_analysis_command(self):
         self.new_window(AnalysisWindow)
 
-    def btnWallet_command(self):
+    def btn_wallet_command(self):
         self.new_window(WalletWindow)
 
 
@@ -155,7 +155,7 @@ if __name__ == "__main__":
     root.attributes('-toolwindow', True)
     MainWindow = MainWindow(root)
 
-    def updatePrices():
+    def update_prices():
         # Perform an update of the information
         # These are all either placeholder or call placeholder functions
         bitcoin_price = G_Utils.get_coin_price(
@@ -164,7 +164,7 @@ if __name__ == "__main__":
         net_worth_increase = (
             (float(G_Utils.get_net_worth("now", "BTC"))/float(G_Utils.get_net_worth("yesterday", "BTC")))*100)-1
 
-        root.after(30000, updatePrices)
-    root.after(30, updatePrices)
+        root.after(30000, update_prices)
+    root.after(30, update_prices)
     root.wm_attributes('-topmost', True)
     root.mainloop()

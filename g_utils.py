@@ -10,7 +10,7 @@ import urllib.request
 class G_Utils:
 
     @staticmethod
-    def runProcess(process_name, sleeptimer):
+    def run_process(process_name, sleeptimer):
         subprocess.Popen(process_name)
         time.sleep(sleeptimer)
         print("Process Started")
@@ -54,10 +54,10 @@ class G_Utils:
         if os.path.isfile("settings.cfg"):
             # Need to check if the file is valid first
             # If valid then return setup complete
-            return "Setup Complete"
+            return True
             # Otherwise return invalid settings file
         else:
-            return "Setup Incomplete"
+            return False
 
     def call_api(suffix):
         # Highly condensed function which returns the json data from nomics
@@ -199,7 +199,7 @@ class G_Utils:
 
     # All of the set functions related to crypto
 
-    def setDefaultExchange():
+    def set_default_exchange():
         # This will set the default exchange in the settings file
         pass
 
