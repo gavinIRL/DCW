@@ -1,6 +1,6 @@
 import tkinter as tk
 import tkinter.font as tkFont
-from g_utils import G_Utils
+from dcw_utils import DCWUtils
 from analysis_window import AnalysisWindow
 from wallet_window import WalletWindow
 from settings_window import SettingsWindow
@@ -78,7 +78,7 @@ class MainWindow():
         self.lbl_user_status["font"] = font_status
         self.lbl_user_status["justify"] = "center"
         self.lbl_user_status["text"] = "User Status: " + \
-            str(G_Utils.checkSettingsFileExists())
+            str(DCWUtils.checkSettingsFileExists())
         self.lbl_user_status.place(x=0, y=5, width=width, height=30)
 
         self.lbl_net_worth = tk.Label(self.root)
@@ -158,11 +158,9 @@ if __name__ == "__main__":
     def update_prices():
         # Perform an update of the information
         # These are all either placeholder or call placeholder functions
-        bitcoin_price = G_Utils.get_coin_price(
-            G_Utils.get_API_key(), "BTC", "1h")
+        bitcoin_price = 13
         bitcoin_price_yesterday = 12
-        net_worth_increase = (
-            (float(G_Utils.get_net_worth("now", "BTC"))/float(G_Utils.get_net_worth("yesterday", "BTC")))*100)-1
+        net_worth_increase = 1
 
         root.after(30000, update_prices)
     root.after(30, update_prices)
