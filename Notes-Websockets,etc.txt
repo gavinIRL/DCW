@@ -1,0 +1,74 @@
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+------------------------------Binance API-------------------------------------
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+--------------------------------
+API requests:
+klines - symbol, interval, limit are required
+ticker/price - symbol is optional
+--------------------------------
+Sample:
+url = "https://api.binance.com/api/v3/klines?symbol=BNBBTC&interval=15m&limit=10"
+response = requests.request("GET", url)
+data = json.loads(response.text)
+print(data)
+--------------------------------
+Data return format for klines (single-row array):
+0 = Open Time
+1 = Open
+2 = High
+3 = Low
+4 = Close
+5 = Volume
+6 = Close Time
+7,8 = Quote asset volume, number of trades
+--------------------------------
+Data return format for ticker/price (multi-row or single-row of dicts):
+"symbol" key
+"price" key
+--------------------------------
+Notes:
+Best way to grab all symbols is https://api.binance.com/api/v3/ticker/price and get prices at same time
+Need to check for a possible 429 response to initiate a cooldown on updating prices
+Need to look into using websocket instead tbh, probably a lot better
+Kline intervals are as follows:
+1m,3m,5m,15m,30m,1h,2h,4h,6h,8h,12h,1d,3d,1w,1M
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+---------------------------------Bitfinex API:--------------------------------
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+API requests:
+tickers - symbols (can use ALL to grab all)
+conf/pub:list:pair:exchange - None required (this grabs all symbols, all trades start with a t)
+candles/trade:1m:tBTCUSD/hist - limit(default 100), sort (1 is old first, -1 is old last)
+--------------------------------
+Data return format for tickers (single-row or multi-row array):
+0 = SYMBOL
+1 = BID
+2 = BID_SIZE
+3 = ASK
+4 = ASK_SIZE
+5 = DAILY_CHANGE
+6 = DAILY_CHANGE_RELATIVE 
+7 = LAST_PRICE
+8 = VOLUME
+9 = HIGH
+10 = LOW
+--------------------------------
+Data return format for candles (single-row array)
+0 = MTS 
+1 = OPEN
+2 = CLOSE
+3 = HIGH
+4 = LOW 
+5 = VOLUME 
+--------------------------------
+Candles path options:
+Always in format of /trade:>insert timeframe<:>insert symbol</hist
+Timeframe choose from: 1m,5m,15m,30m,1h,3h,6h,12h,1D,7D,14D,1M
+--------------------------------
+Timeframe differences vs binance:
+Missing 3m,2h,4h,8h
+Added 3h, 14D
+Changed 1w is now 7D
+All days are now big D
