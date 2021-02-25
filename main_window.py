@@ -25,8 +25,8 @@ class MainWindow():
         # setting window size
         width = 300
         height = 321
-        width_screen = self.root.winfo_width_screen()
-        height_screen = self.root.winfo_height_screen()
+        width_screen = self.root.winfo_screenwidth()
+        height_screen = self.root.winfo_screenheight()
         alignstr = '%dx%d+%d+%d' % (width, height,
                                     (width_screen - width) / 2, (height_screen - height) / 2)
         self.root.geometry(alignstr)
@@ -70,14 +70,14 @@ class MainWindow():
         self.btn_alerts = tk.Button(self.root)
         self.btn_alerts["font"] = font_button
         self.btn_alerts["justify"] = "center"
-        self.btn_alerts["text"] = "Alerts"
+        self.btn_alerts["text"] = "Open Alerts"
         self.btn_alerts.place(x=0, y=290, width=width, height=30)
         self.btn_alerts["command"] = self.btn_alerts_command
 
         self.lbl_user_status = tk.Label(self.root)
         self.lbl_user_status["font"] = font_status
         self.lbl_user_status["justify"] = "center"
-        self.lbl_user_status["text"] = "User Status: " + \
+        self.lbl_user_status["text"] = "User Setup Complete: " + \
             str(DCWUtils.checkSettingsFileExists())
         self.lbl_user_status.place(x=0, y=5, width=width, height=30)
 
@@ -162,7 +162,7 @@ if __name__ == "__main__":
         bitcoin_price_yesterday = 12
         net_worth_increase = 1
 
-        root.after(30000, update_prices)
+        root.after(5000, update_prices)
     root.after(30, update_prices)
     root.wm_attributes('-topmost', True)
     root.mainloop()
