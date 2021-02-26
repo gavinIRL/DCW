@@ -18,7 +18,7 @@ class MainWindow():
         self.new_window_alerts = None
         # set fonts
         font_button = tkFont.Font(family='Times', size=12)
-        ft = tkFont.Font(family='Times', size=12)
+        font_label = tkFont.Font(family='Times', size=12)
         font_status = tkFont.Font(family='Times', size=12, weight="bold")
         # setting title
         self.root.title("DCW Main Menu")
@@ -47,14 +47,14 @@ class MainWindow():
         self.btn_settings["command"] = self.btn_settings_command
 
         self.lbl_bitcoin_price = tk.Label(self.root)
-        self.lbl_bitcoin_price["font"] = ft
+        self.lbl_bitcoin_price["font"] = font_label
         self.lbl_bitcoin_price["justify"] = "center"
         # This gets updated later, but a placeholder for startup
         self.lbl_bitcoin_price["text"] = "Bitcoin price at login: $190"
         self.lbl_bitcoin_price.place(x=0, y=125, width=width, height=30)
 
         self.lbl_bitcoin_hilo = tk.Label(self.root)
-        self.lbl_bitcoin_hilo["font"] = ft
+        self.lbl_bitcoin_hilo["font"] = font_label
         self.lbl_bitcoin_hilo["justify"] = "center"
         # This gets updated later, but a placeholder for startup
         self.lbl_bitcoin_hilo["text"] = "Bitcoin: 24hr high $200 | low $180"
@@ -89,7 +89,7 @@ class MainWindow():
         self.lbl_net_worth.place(x=0, y=35, width=width, height=30)
 
         self.lbl_net_worth_incr = tk.Label(self.root)
-        self.lbl_net_worth_incr["font"] = ft
+        self.lbl_net_worth_incr["font"] = font_label
         self.lbl_net_worth_incr["justify"] = "center"
         # This gets updated later, but a placeholder for startup
         self.lbl_net_worth_incr["text"] = "User 24hr Net Worth Increase: 11%"
