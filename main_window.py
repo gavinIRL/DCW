@@ -12,12 +12,14 @@ class MainWindow():
 
     def __init__(self, root):
         self.root = root
-        # set variables
+        # set variables for handling windows
         self.new_window_analysis = None
         self.new_window_wallet = None
         self.new_window_settings = None
         self.new_window_alerts = None
         self.new_window_market = None
+        # set variables that control updates
+        self.update_time = 2000
         # set fonts
         font_button = tkFont.Font(family='Times', size=12)
         font_label = tkFont.Font(family='Times', size=12)
@@ -52,7 +54,7 @@ class MainWindow():
         self.lbl_bitcoin_price["font"] = font_label
         self.lbl_bitcoin_price["justify"] = "center"
         # This gets updated later, but a placeholder for startup
-        self.lbl_bitcoin_price["text"] = "Bitcoin price at login: $190"
+        self.lbl_bitcoin_price["text"] = "Bitcoin price: $190"
         self.lbl_bitcoin_price.place(x=0, y=125, width=width, height=30)
 
         self.lbl_bitcoin_hilo = tk.Label(self.root)
@@ -171,20 +173,39 @@ class MainWindow():
     def btn_market_command(self):
         self.new_window(MarketWindow)
 
+    def update_bitcoin_values(self, data=[2004, 2009, 1994]):
+        self.lbl_bitcoin_hilo["text"] = "Bitcoin: 24hr high $" + \
+            str(data[1]) + " | low $" + str(data[2])
+        self.lbl_bitcoin_price["text"] = "Bitcoin price: $"+str(data[0])
+
 
 if __name__ == "__main__":
     root = tk.Tk()
     root.attributes('-toolwindow', True)
     MainWindow = MainWindow(root)
 
+    # Having this as a function for readability only
+    def startup():
+        # Perform the startup functions such as grabbing settings
+        # The prices will be grabbed in update prices so no need to do anything here
+        pass
+
     def update_prices():
         # Perform an update of the information
         # These are all either placeholder or call placeholder functions
-        bitcoin_price = 13
-        bitcoin_price_yesterday = 12
-        net_worth_increase = 1
+        # If the market window isn't open then update at a slower rate of once per 15 seconds
+        ticker_time = 15000
+        if MainWindow.new_window_market != None:
+            ticker_time = MainWindow.update_time
+            # Then update the prices in that window
 
-        root.after(5000, update_prices)
+        # Finally grab the data and update mainwindow
+        MainWindow.update_bitcoin_values([4001, 4002, 4000])
+
+        root.after(ticker_time, update_prices)
+
+    # Now perform the startup process and update as required
+    startup()
     root.after(30, update_prices)
     root.wm_attributes('-topmost', True)
     root.mainloop()

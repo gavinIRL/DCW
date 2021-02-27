@@ -3,7 +3,6 @@ import tkinter.font as tkFont
 
 
 class MarketWindow:
-    # Later include the list of currencies as a parameter (array)
     def __init__(self, mainwindow, root, currencies=["BTC", "ETH", "IOTA"]):
         self.mainwindow = mainwindow
         self.root = root
