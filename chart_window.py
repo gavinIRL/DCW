@@ -9,12 +9,12 @@ from matplotlib.figure import Figure
 matplotlib.use("TkAgg")
 
 
-class AnalysisWindow:
+class ChartWindow:
     def __init__(self, mainwindow, root):
         self.mainwindow = mainwindow
         self.root = root
         self.root.geometry("400x400+400+400")
-        self.label = tk.Label(root, text=f"This is the analysis window")
+        self.label = tk.Label(root, text=f"This is the chart window")
         self.label.pack()
 
         self.fig = Figure(figsize=(7, 7), dpi=115)
