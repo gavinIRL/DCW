@@ -173,21 +173,24 @@ class MainWindow():
     def btn_market_command(self):
         self.new_window(MarketWindow)
 
-    def update_bitcoin_values(self, data=[2004, 2009, 1994]):
-        self.lbl_bitcoin_hilo["text"] = "Bitcoin: 24hr high $" + \
-            str(data[1]) + " | low $" + str(data[2])
-        self.lbl_bitcoin_price["text"] = "Bitcoin price: $"+str(data[0])
+    def update_bitcoin_price(self, price=1337):
+        self.lbl_bitcoin_price["text"] = "Bitcoin price: $"+str(price)
 
 
 if __name__ == "__main__":
     root = tk.Tk()
     root.attributes('-toolwindow', True)
     MainWindow = MainWindow(root)
-
+    dcw = DCWUtils(exchange="Binance")
     # Having this as a function for readability only
+
     def startup():
         # Perform the startup functions such as grabbing settings
         # The prices will be grabbed in update prices so no need to do anything here
+        # Only going to update the bitcoin hilo once
+        data = [100, 200, 300]  # need to grab a candle here
+        MainWindow.lbl_bitcoin_hilo["text"] = "Bitcoin: 24hr high $" + \
+            str(data[1]) + " | low $" + str(data[2])
         pass
 
     def update_prices():
@@ -198,14 +201,13 @@ if __name__ == "__main__":
         if MainWindow.new_window_market != None:
             ticker_time = MainWindow.update_time
             # Then update the prices in that window
-
-        # Finally grab the data and update mainwindow
-        MainWindow.update_bitcoin_values([4001, 4002, 4000])
+        # Finally grab the data and update mainwindow, using a function for brevity
+        MainWindow.update_bitcoin_price(dcw.get_tick("BTCUSDT"))
 
         root.after(ticker_time, update_prices)
 
     # Now perform the startup process and update as required
-    startup()
-    root.after(30, update_prices)
+    root.after(1000, startup)
+    root.after(2000, update_prices)
     root.wm_attributes('-topmost', True)
     root.mainloop()
