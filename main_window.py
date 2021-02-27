@@ -1,10 +1,11 @@
 import tkinter as tk
 import tkinter.font as tkFont
 from dcw_utils import DCWUtils
-from analysis_window import AnalysisWindow
+from chart_window import ChartWindow
 from wallet_window import WalletWindow
 from settings_window import SettingsWindow
 from alerts_window import AlertsWindow
+from market_window import MarketWindow
 
 
 class MainWindow():
@@ -16,6 +17,7 @@ class MainWindow():
         self.new_window_wallet = None
         self.new_window_settings = None
         self.new_window_alerts = None
+        self.new_window_market = None
         # set fonts
         font_button = tkFont.Font(family='Times', size=12)
         font_label = tkFont.Font(family='Times', size=12)
@@ -24,7 +26,7 @@ class MainWindow():
         self.root.title("DCW Main Menu")
         # setting window size
         width = 300
-        height = 321
+        height = 331
         width_screen = self.root.winfo_screenwidth()
         height_screen = self.root.winfo_screenheight()
         alignstr = '%dx%d+%d+%d' % (width, height,
@@ -32,12 +34,12 @@ class MainWindow():
         self.root.geometry(alignstr)
         self.root.resizable(width=False, height=False)
 
-        self.btn_analysis = tk.Button(self.root)
-        self.btn_analysis["font"] = font_button
-        self.btn_analysis["justify"] = "center"
-        self.btn_analysis["text"] = "Open Analysis Window"
-        self.btn_analysis.place(x=0, y=230, width=width, height=30)
-        self.btn_analysis["command"] = self.btn_analysis_command
+        self.btn_chart = tk.Button(self.root)
+        self.btn_chart["font"] = font_button
+        self.btn_chart["justify"] = "center"
+        self.btn_chart["text"] = "Open Chart Window"
+        self.btn_chart.place(x=0, y=230, width=width, height=30)
+        self.btn_chart["command"] = self.btn_chart_command
 
         self.btn_settings = tk.Button(self.root)
         self.btn_settings["font"] = font_button
@@ -71,7 +73,7 @@ class MainWindow():
         self.btn_alerts["font"] = font_button
         self.btn_alerts["justify"] = "center"
         self.btn_alerts["text"] = "Open Alerts"
-        self.btn_alerts.place(x=0, y=290, width=width, height=30)
+        self.btn_alerts.place(x=0, y=300, width=width, height=30)
         self.btn_alerts["command"] = self.btn_alerts_command
 
         self.lbl_user_status = tk.Label(self.root)
@@ -88,6 +90,13 @@ class MainWindow():
         self.lbl_net_worth["text"] = "User Net Worth: $1000"
         self.lbl_net_worth.place(x=0, y=35, width=width, height=30)
 
+        self.btn_market = tk.Button(self.root)
+        self.btn_market["font"] = font_button
+        self.btn_market["justify"] = "center"
+        self.btn_market["text"] = "Open Market Overview"
+        self.btn_market.place(x=0, y=265, width=width, height=30)
+        self.btn_market["command"] = self.btn_market_command
+
         self.lbl_net_worth_incr = tk.Label(self.root)
         self.lbl_net_worth_incr["font"] = font_label
         self.lbl_net_worth_incr["justify"] = "center"
@@ -97,7 +106,7 @@ class MainWindow():
 
     def destroy_analysis(self):
         self.new_window_analysis.destroy()
-        self.btn_analysis["state"] = "normal"
+        self.btn_chart["state"] = "normal"
 
     def destroy_wallet(self):
         self.new_window_wallet.destroy()
@@ -111,6 +120,10 @@ class MainWindow():
         self.new_window_alerts.destroy()
         self.btn_alerts["state"] = "normal"
 
+    def destroy_market(self):
+        self.new_window_market.destroy()
+        self.btn_market["state"] = "normal"
+
     def new_window(self, _class):
         if _class is WalletWindow:
             self.btn_wallet["state"] = "disabled"
@@ -118,8 +131,8 @@ class MainWindow():
             self.new_window_wallet.protocol(
                 "WM_DELETE_WINDOW", self.destroy_wallet)
             _class(self, self.new_window_wallet)
-        if _class is AnalysisWindow:
-            self.btn_analysis["state"] = "disabled"
+        if _class is ChartWindow:
+            self.btn_chart["state"] = "disabled"
             self.new_window_analysis = tk.Toplevel(self.root)
             self.new_window_analysis.protocol(
                 "WM_DELETE_WINDOW", self.destroy_analysis)
@@ -136,6 +149,12 @@ class MainWindow():
             self.new_window_alerts.protocol(
                 "WM_DELETE_WINDOW", self.destroy_alerts)
             _class(self, self.new_window_alerts)
+        if _class is MarketWindow:
+            self.btn_market["state"] = "disabled"
+            self.new_window_market = tk.Toplevel(self.root)
+            self.new_window_market.protocol(
+                "WM_DELETE_WINDOW", self.destroy_market)
+            _class(self, self.new_window_market)
 
     def btn_settings_command(self):
         self.new_window(SettingsWindow)
@@ -143,11 +162,14 @@ class MainWindow():
     def btn_alerts_command(self):
         self.new_window(AlertsWindow)
 
-    def btn_analysis_command(self):
-        self.new_window(AnalysisWindow)
+    def btn_chart_command(self):
+        self.new_window(ChartWindow)
 
     def btn_wallet_command(self):
         self.new_window(WalletWindow)
+
+    def btn_market_command(self):
+        self.new_window(MarketWindow)
 
 
 if __name__ == "__main__":
