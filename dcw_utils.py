@@ -2,6 +2,9 @@ import os
 import datetime
 import json
 import requests
+import numpy as np
+import pandas as pd
+import numba as nb
 
 # This is the class that contains the workhorse functions
 # I admit it is a really confused class, over 50% static methods
@@ -114,6 +117,39 @@ class DCWUtils():
     def set_wallet(currency_list):
         pass
 
+    @nb.jit(fastmath=True, nopython=True)
+    def calculate_rsi(list, deltas, avg_gain, avg_loss, n):
+
+        # Use Wilder smoothing method
+        def up(x): return x if x > 0 else 0
+        def down(x): return -x if x < 0 else 0
+        i = n+1
+        for d in deltas[n+1:]:
+            avg_gain = ((avg_gain * (n-1)) + up(d)) / n
+            avg_loss = ((avg_loss * (n-1)) + down(d)) / n
+            if avg_loss != 0:
+                rs = avg_gain / avg_loss
+                list[i] = 100 - (100 / (1 + rs))
+            else:
+                list[i] = 100
+            i += 1
+
+        return list
+
+    def get_rsi(list, n=14):
+
+        deltas = np.append([0], np.diff(list))
+
+        avg_gain = np.sum(deltas[1:n+1].clip(min=0)) / n
+        avg_loss = -np.sum(deltas[1:n+1].clip(max=0)) / n
+
+        list = np.empty(deltas.shape[0])
+        list.fill(np.nan)
+        list = DCWUtils.calculate_rsi(list, deltas, avg_gain, avg_loss, n)
+        # Now remove the NaN's when returning
+        list = list[~np.isnan(list)]
+        return list
+
     @staticmethod
     def checkSettingsFileExists():
         # check if file exists
@@ -128,8 +164,11 @@ class DCWUtils():
 
 if __name__ == "__main__":
     # playground for testing
-    dcw = DCWUtils("Binance")
+    #dcw = DCWUtils("Binance")
     #print(dcw.request_api("candles/trade:1m:tBTCUSD/hist?limit=10", True))
-    output = dcw.get_coin_candle(target="High")
-    for line in output:
-        print(line)
+    #output = dcw.get_coin_candle(target="High")
+    # for line in output:
+    #    print(line)
+    result = DCWUtils.get_rsi([100, 120, 130, 125, 128, 116,
+                               104, 98, 87, 88, 90, 95, 99], n=6)
+    print(result)
