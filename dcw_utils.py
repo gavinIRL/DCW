@@ -88,10 +88,22 @@ class DCWUtils():
         else:
             return False
 
-    def get_tick(self, pair, return_data="CHL"):
+    def get_tick(self, pair=False):
         if self.exchange == "Binance":
-            data = self.request_api("ticker/price?symbol="+pair)
-            return str(data["price"]).strip("0")
+            if isinstance(pair, str):
+                data = self.request_api("ticker/price?symbol="+pair)
+                return str(data["price"]).strip("0")
+            elif isinstance(pair, list):
+                data = self.request_api("ticker/price")
+                return_data = {}
+                for entry in data:
+                    if entry["symbol"] in pair:
+                        stripped = str(entry["price"]).rstrip("0")
+                        return_data.update({entry["symbol"]: stripped})
+                return return_data
+            else:
+                data = self.request_api("ticker/price")
+                return data
 
     def get_coin_candle(self, currency="BTC", base="USDT", interval="15m", limit=10, target=False, include_time=True, time_ms=False):
         if self.exchange == "Binance":
@@ -209,11 +221,11 @@ class DCWUtils():
 
 if __name__ == "__main__":
     # playground for testing
+    curlist = [
+        "BTCUSDT", "ETHUSDT", "ADAUSDT", "BNBUSDT", "DOTUSDT", "XRPUSDT", "LTCUSDT"]
     dcw = DCWUtils("Binance")
     #print(dcw.request_api("candles/trade:1m:tBTCUSD/hist?limit=10", True))
     #output = dcw.get_coin_candle(target="High")
-    # for line in output:
-    #    print(line)
-    # result = DCWUtils.get_rsi([100, 120, 130, 125, 128, 116,
-    #                            104, 98, 87, 88, 90, 95, 99], n=6)
-    # print(result)
+    output = dcw.get_tick(curlist)
+    for line in output:
+        print(line)

@@ -21,7 +21,8 @@ class MainWindow():
         # set variables that hold the settings
         self.update_time = 2000
         self.market_currency_list = [
-            "BTC", "ETH", "ADA", "BNB", "DOT", "XRP", "LTC", "XLM", "BCH", "DOGE", "XEM", "ATOM", "XMR", "BSV", "EOS"]
+            "BTCUSDT", "ETHUSDT", "ADAUSDT", "BNBUSDT", "DOTUSDT", "XRPUSDT", "LTCUSDT", "XLMUSDT",
+            "BCHUSDT", "DOGEUSDT", "XEMUSDT", "ATOMUSDT", "XMRUSDT", "BSVUSDT", "EOSUSDT"]
         # set fonts
         font_button = tkFont.Font(family='Times', size=12)
         font_label = tkFont.Font(family='Times', size=12)
@@ -195,7 +196,7 @@ if __name__ == "__main__":
         data = [100, 200, 300]  # need to grab a candle here
         MainWindow.lbl_bitcoin_hilo["text"] = "Bitcoin: 24hr high $" + \
             str(data[1]) + " | low $" + str(data[2])
-        pass
+        print(dcw.get_tick(MainWindow.market_currency_list))
 
     def update_prices():
         # Perform an update of the information
@@ -205,6 +206,7 @@ if __name__ == "__main__":
         if MainWindow.new_window_market != None:
             ticker_time = MainWindow.update_time
             # Then update the prices in that window
+
         # Finally grab the data and update mainwindow, using a function for brevity
         MainWindow.update_bitcoin_price(dcw.get_tick("BTCUSDT"))
 

@@ -15,6 +15,7 @@ class ChartWindow:
         self.root = root
         self.root.geometry("400x400+400+400")
         self.starting_currency = kwargs.get("currency")
+        self.starting_candle = kwargs.get("candle")
         self.label = tk.Label(
             root, text=f"This is the chart window for "+str(self.starting_currency))
         self.label.pack()
