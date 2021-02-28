@@ -7,6 +7,8 @@ import pandas as pd
 import numba as nb
 import time
 from requests.exceptions import HTTPError
+import threading
+import queue
 
 # This is the class that contains the workhorse functions
 # I admit it is a really confused class, over 50% static methods
@@ -104,6 +106,27 @@ class DCWUtils():
             else:
                 data = self.request_api("ticker/price")
                 return data
+
+    def get_candle(self, pair, interval, limit, raw=False):
+        if self.exchange == "Binance":
+            data = self.request_api(
+                "klines?symbol="+pair+"&interval="+interval+"&limit="+str(limit))
+            if raw:
+                return data
+            else:
+                return_data = []
+                for row in data:
+                    # Don't want all the entries
+                    timepoint = {}
+                    timepoint["Open Time"] = row[0]
+                    timepoint["Open"] = row[1]
+                    timepoint["High"] = row[2]
+                    timepoint["Low"] = row[3]
+                    timepoint["Close"] = row[4]
+                    timepoint["Volume"] = row[5]
+                    timepoint["Close Time"] = row[6]
+                    return_data.append(timepoint)
+                return return_data
 
     def get_coin_candle(self, currency="BTC", base="USDT", interval="15m", limit=10, target=False, include_time=True, time_ms=False):
         if self.exchange == "Binance":
@@ -209,15 +232,6 @@ class DCWUtils():
         else:
             return False
 
-    def update_candles(mw, root):
-        # This is not called immediately at startup
-        # But instead when market window has finished assembling candles
-        if mw.new_window_market != None:
-            # Update the candles
-
-            # Then make sure to update it every 2.5mins
-            root.after(15000, lambda: DCWUtils.update_candles(mw, root))
-
 
 if __name__ == "__main__":
     # playground for testing
@@ -226,6 +240,6 @@ if __name__ == "__main__":
     dcw = DCWUtils("Binance")
     #print(dcw.request_api("candles/trade:1m:tBTCUSD/hist?limit=10", True))
     #output = dcw.get_coin_candle(target="High")
-    output = dcw.get_tick(curlist)
+    output = dcw.get_candle("BTCUSDT", "1m", 10)
     for line in output:
         print(line)

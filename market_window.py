@@ -2,6 +2,8 @@ import tkinter as tk
 import tkinter.font as tkFont
 from dcw_utils import DCWUtils
 from chart_window import ChartWindow
+import time
+import threading
 
 
 class MarketWindow:
@@ -13,6 +15,9 @@ class MarketWindow:
         # These variables are for storing the latest data
         # Used for opening chart window from scratch and also pushing updates
         self.candles = []
+        self.prices = []
+        for entry in self.currencies:
+            self.prices.append(100)
 
         font_heading = tkFont.Font(family='Times', size=10, weight="bold")
         font_label = tkFont.Font(family='Times', size=10)
@@ -85,14 +90,14 @@ class MarketWindow:
         self.lbl_heading = tk.Label(self.root)
         self.lbl_heading["font"] = font_heading
         self.lbl_heading["justify"] = "center"
-        self.lbl_heading["text"] = "High"
+        self.lbl_heading["text"] = "24High"
         self.lbl_heading.place(x=horz_distance, y=35, width=55, height=20)
 
         horz_distance += 60
         self.lbl_heading = tk.Label(self.root)
         self.lbl_heading["font"] = font_heading
         self.lbl_heading["justify"] = "center"
-        self.lbl_heading["text"] = "Low"
+        self.lbl_heading["text"] = "24Low"
         self.lbl_heading.place(x=horz_distance, y=35, width=55, height=20)
 
         self.labels_symbols = []
@@ -190,8 +195,8 @@ class MarketWindow:
         # Then fill out the initial data
         self.startup()
         # And then start updating candles every 2 mins while the window is open
-        if self.mainwindow:
-            DCWUtils.update_candles(self.mainwindow, self.root)
+        root.after(100, self.update_candles(self.mainwindow, self.root))
+        # if self.mainwindow:
 
     def btn_chart_command(self, index):
         # print(index)
@@ -201,18 +206,53 @@ class MarketWindow:
         pass
 
     def startup(self):
-        for currency in self.currencies:
-            # First need to grab all the current prices and get that data started
-            pass
-        for i, currency in enumerate(self.currencies):
-            # Then need to go through the currencylist and get the candles to start off
-            pass
+        dcw = DCWUtils(exchange="Binance")
+        fresh_data = dcw.get_tick(self.mainwindow.market_currency_list)
+        self.update_all_prices(fresh_data)
 
     def update_all_prices(self, data):
         for pair, price in data.items():
             # print("Pair = "+pair+" , Price= "+price)
-            self.labels_current[self.currencies.index(
-                pair)]["text"] = str(price)
+            index = self.currencies.index(pair)
+            self.labels_current[index]["text"] = str(price)
+            self.prices[index] = float(price)
+
+    def update_percentages_new(self, pair, data_5m, data_1h, data_1w):
+        index = self.currencies.index(pair)
+        current = float(self.prices[index])
+        print(data_1w)
+        change_percent_5m = 100*(1-(float(data_5m["Close"])/current))
+        change_percent_1h = 100*(1-(float(data_1h["Close"])/current))
+        change_percent_1w = 100*(1-(float(data_1w["Close"])/current))
+        self.labels_change5m[index].configure(text=str(
+            format(change_percent_5m, ".3g")))
+        self.labels_change1h[index].configure(text=str(
+            format(change_percent_1h, ".3g")))
+        self.labels_change1w[index].configure(text=str(
+            format(change_percent_1w, ".3g")))
+        #print("Working, this is for pair: "+pair)
+
+    def candle_thread_handler(self, mw, dcw, pair, sleep_timer):
+        time.sleep(sleep_timer)
+        data_5m_1h = dcw.get_candle(pair, "5m", 12)
+        data_1w = dcw.get_candle(pair, "1w", 1)
+        mw.mw.update_percentages_new(
+            pair, data_5m_1h[-1], data_5m_1h[0], data_1w[0])
+
+    def update_candles(self, mw, root):
+        # This is last thing called after opening market window
+        if self.mainwindow.mw != None:
+            # Grab the information
+            dcw = DCWUtils("Binance")
+            for i, pair in enumerate(self.mainwindow.market_currency_list):
+                t = threading.Thread(target=self.candle_thread_handler,
+                                     args=(mw, dcw, pair, i*0.5))
+                self.mainwindow.threads.append(t)
+                t.start()
+            # Then make sure to update it every 2.5mins
+            root.after(150000, lambda: self.update_candles(mw, root))
+        else:
+            root.after(500, lambda: self.update_candles(mw, root))
 
 
 if __name__ == "__main__":

@@ -1,3 +1,4 @@
+import threading
 import tkinter as tk
 import tkinter.font as tkFont
 from dcw_utils import DCWUtils
@@ -6,12 +7,22 @@ from wallet_window import WalletWindow
 from settings_window import SettingsWindow
 from alerts_window import AlertsWindow
 from market_window import MarketWindow
+import queue
+import time
+import threading
 
 
 class MainWindow():
 
     def __init__(self, root):
         self.root = root
+
+        # Testing variables
+        # self.test_button = tk.Button(
+        #    self.root, command=self.tb_click, text="Test")
+        #self.test_button.place(x=0, y=230, width=300, height=30)
+        self.threads = []
+
         # set variables for handling windows
         self.new_window_analysis = None
         self.new_window_wallet = None
@@ -110,6 +121,18 @@ class MainWindow():
         # This gets updated later, but a placeholder for startup
         self.lbl_net_worth_incr["text"] = "User 24hr Net Worth Increase: 11%"
         self.lbl_net_worth_incr.place(x=0, y=65, width=width, height=30)
+
+    # Test functions:
+    # def worker(self, num):
+    #     time.sleep(5)
+    #     print("Task #" + str(num))
+
+    # def tb_click(self):
+    #     self.queue = queue.Queue()
+    #     for i in range(6):
+    #         t = threading.Thread(target=self.worker, args=(i,))
+    #         self.threads.append(t)
+    #         t.start()
 
     # def destroy_analysis(self):
     #     self.new_window_analysis.destroy()
