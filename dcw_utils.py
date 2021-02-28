@@ -197,6 +197,15 @@ class DCWUtils():
         else:
             return False
 
+    def update_candles(mw, root):
+        # This is not called immediately at startup
+        # But instead when market window has finished assembling candles
+        if mw.new_window_market != None:
+            # Update the candles
+
+            # Then make sure to update it every 2.5mins
+            root.after(15000, lambda: DCWUtils.update_candles(mw, root))
+
 
 if __name__ == "__main__":
     # playground for testing

@@ -18,8 +18,10 @@ class MainWindow():
         self.new_window_settings = None
         self.new_window_alerts = None
         self.new_window_market = None
-        # set variables that control updates
+        # set variables that hold the settings
         self.update_time = 2000
+        self.market_currency_list = [
+            "BTC", "ETH", "ADA", "BNB", "DOT", "XRP", "LTC", "XLM", "BCH", "DOGE", "XEM", "ATOM", "XMR", "BSV", "EOS"]
         # set fonts
         font_button = tkFont.Font(family='Times', size=12)
         font_label = tkFont.Font(family='Times', size=12)
@@ -125,6 +127,7 @@ class MainWindow():
     def destroy_market(self):
         self.new_window_market.destroy()
         self.btn_market["state"] = "normal"
+        self.new_window_market = None
 
     def new_window(self, _class):
         if _class is WalletWindow:
@@ -156,7 +159,8 @@ class MainWindow():
             self.new_window_market = tk.Toplevel(self.root)
             self.new_window_market.protocol(
                 "WM_DELETE_WINDOW", self.destroy_market)
-            _class(self, self.new_window_market)
+            _class(self, self.new_window_market,
+                   currencies=self.market_currency_list)
 
     def btn_settings_command(self):
         self.new_window(SettingsWindow)

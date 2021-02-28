@@ -1,5 +1,6 @@
 import tkinter as tk
 import tkinter.font as tkFont
+from dcw_utils import DCWUtils
 
 
 class MarketWindow:
@@ -160,15 +161,27 @@ class MarketWindow:
             btn_chart.place(x=575, y=55+i*spacing, width=40, height=spacing-2)
             btn_chart["command"] = lambda: self.btn_chart_command(currency)
             self.btns_chart.append(btn_chart)
+        # Then fill out the initial data
+        self.startup()
+        # And then start updating candles every 2 mins while the window is open
+        DCWUtils.update_candles(self.mainwindow, self.root)
 
     def btn_chart_command(self, currency):
         # Open chart window for the given currency
         pass
+
+    def startup(self):
+        for currency in self.currencies:
+            # First need to grab all the current prices and get that data started
+            pass
+        for i, currency in enumerate(self.currencies):
+            # Then need to go through the currencylist and get the candles to start off
+            pass
 
 
 if __name__ == "__main__":
     root = tk.Tk()
     root.attributes('-toolwindow', True)
     sw = MarketWindow(None, root, currencies=[
-                      "BTC", "ETH", "BNB", "IOTA", "LTC", "DOT", "ADA", "BCH", "DOGE", "XRP", "BSC", "BNT", "PNY"])
+                      "BTC", "ETH", "ADA", "BNB", "DOT", "XRP", "LTC", "XLM", "BCH", "DOGE", "XEM", "ATOM", "XMR", "BSV", "EOS"])
     root.mainloop()
