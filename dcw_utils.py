@@ -5,6 +5,8 @@ import requests
 import numpy as np
 import pandas as pd
 import numba as nb
+import time
+from requests.exceptions import HTTPError
 
 # This is the class that contains the workhorse functions
 # I admit it is a really confused class, over 50% static methods
@@ -27,7 +29,36 @@ class DCWUtils():
 
     def request_api(self, suffix):
         url = self.url_base + suffix
-        return json.loads(requests.request("GET", url).text)
+        try:
+            response = requests.request("GET", url)
+            if response.status_code == 200:
+                return json.loads(response.text)
+            elif response.status_code == 404:
+                print("Incorrect input, got 404'd")
+                return False
+            elif response.status_code == 429 or response.status_code == 418:
+                wait_seconds = int(response.headers["Retry-After"])
+                print("Making too many requests, on the naughty step for " +
+                      str(wait_seconds)+" seconds")
+                time.sleep(wait_seconds)
+                return False
+            else:
+                print(response.status_code)
+                return False
+        # This is to catch in case the above raises errors rather than returning codes
+        except HTTPError as err:
+            if err.code == 404:
+                print("Incorrect input, got 404'd")
+                return False
+            elif err.code == 429 or err.code == 418:
+                wait_seconds = int(response.headers["Retry-After"])
+                print("Making too many requests, on the naughty step for " +
+                      str(wait_seconds)+" seconds")
+                time.sleep(wait_seconds)
+                return False
+            else:
+                print(err.code)
+                return False
 
     def calculate_RSI(closelist, alpha=14):
         # Calculate the SMMA and then RSI given a sequence of closes
