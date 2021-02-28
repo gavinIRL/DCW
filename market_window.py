@@ -208,6 +208,12 @@ class MarketWindow:
             # Then need to go through the currencylist and get the candles to start off
             pass
 
+    def update_all_prices(self, data):
+        for pair, price in data.items():
+            # print("Pair = "+pair+" , Price= "+price)
+            self.labels_current[self.currencies.index(
+                pair)]["text"] = str(price)
+
 
 if __name__ == "__main__":
     root = tk.Tk()

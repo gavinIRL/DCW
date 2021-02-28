@@ -18,11 +18,13 @@ class MainWindow():
         self.new_window_settings = None
         self.new_window_alerts = None
         self.new_window_market = None
+        # this will hold the marketwindow itself
+        self.mw = None
         # set variables that hold the settings
         self.update_time = 2000
         self.market_currency_list = [
             "BTCUSDT", "ETHUSDT", "ADAUSDT", "BNBUSDT", "DOTUSDT", "XRPUSDT", "LTCUSDT", "XLMUSDT",
-            "BCHUSDT", "DOGEUSDT", "XEMUSDT", "ATOMUSDT", "XMRUSDT", "BSVUSDT", "EOSUSDT"]
+            "BCHUSDT", "DOGEUSDT", "XEMUSDT", "ATOMUSDT", "XMRUSDT", "EOSUSDT", "TRXUSDT"]
         # set fonts
         font_button = tkFont.Font(family='Times', size=12)
         font_label = tkFont.Font(family='Times', size=12)
@@ -160,8 +162,8 @@ class MainWindow():
             self.new_window_market = tk.Toplevel(self.root)
             self.new_window_market.protocol(
                 "WM_DELETE_WINDOW", self.destroy_market)
-            _class(self, self.new_window_market,
-                   currencies=self.market_currency_list)
+            self.mw = _class(self, self.new_window_market,
+                             currencies=self.market_currency_list)
 
     def btn_settings_command(self):
         self.new_window(SettingsWindow)
@@ -196,24 +198,29 @@ if __name__ == "__main__":
         data = [100, 200, 300]  # need to grab a candle here
         MainWindow.lbl_bitcoin_hilo["text"] = "Bitcoin: 24hr high $" + \
             str(data[1]) + " | low $" + str(data[2])
-        print(dcw.get_tick(MainWindow.market_currency_list))
+        # print(dcw.get_tick(MainWindow.market_currency_list))
 
     def update_prices():
         # Perform an update of the information
         # These are all either placeholder or call placeholder functions
         # If the market window isn't open then update at a slower rate of once per 15 seconds
-        ticker_time = 15000
+        ticker_time = 7500
         if MainWindow.new_window_market != None:
             ticker_time = MainWindow.update_time
-            # Then update the prices in that window
+            # Then update the prices in the market window
+            fresh_data = dcw.get_tick(MainWindow.market_currency_list)
+            MainWindow.mw.update_all_prices(fresh_data)
+            MainWindow.update_bitcoin_price(fresh_data["BTCUSDT"])
+            # And also update the bitcoin price on mainwindow
 
-        # Finally grab the data and update mainwindow, using a function for brevity
-        MainWindow.update_bitcoin_price(dcw.get_tick("BTCUSDT"))
+        # Otherwise grab the data and update mainwindow only
+        else:
+            MainWindow.update_bitcoin_price(dcw.get_tick("BTCUSDT"))
 
         root.after(ticker_time, update_prices)
 
     # Now perform the startup process and update as required
-    root.after(1000, startup)
-    root.after(2000, update_prices)
+    root.after(500, startup)
+    root.after(1000, update_prices)
     root.wm_attributes('-topmost', True)
     root.mainloop()
