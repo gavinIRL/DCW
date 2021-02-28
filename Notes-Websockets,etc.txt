@@ -3,8 +3,11 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 --------------------------------
 API requests:
-klines - symbol, interval, limit are required
+klines - symbol, interval, limit are required       <= use this with limit 60 to grab the 5min and 1hr data (12hrs) interval 1m
+                                                       also use limit 168 to grab the 24hr and 1wk data with interval 1h
+                                                       gives enough datapoints for RSI also
 ticker/price - symbol is optional
+ticker/24hr - symbol is required or else 40 weight  <= use this to grab the 24hr data for the marketwindow at start maybe?
 --------------------------------
 Sample:
 url = "https://api.binance.com/api/v3/klines?symbol=BNBBTC&interval=15m&limit=10"
