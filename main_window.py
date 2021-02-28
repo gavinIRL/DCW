@@ -38,12 +38,12 @@ class MainWindow():
         self.root.geometry(alignstr)
         self.root.resizable(width=False, height=False)
 
-        self.btn_chart = tk.Button(self.root)
-        self.btn_chart["font"] = font_button
-        self.btn_chart["justify"] = "center"
-        self.btn_chart["text"] = "Open Chart Window"
-        self.btn_chart.place(x=0, y=230, width=width, height=30)
-        self.btn_chart["command"] = self.btn_chart_command
+        # self.btn_chart = tk.Button(self.root)
+        # self.btn_chart["font"] = font_button
+        # self.btn_chart["justify"] = "center"
+        # self.btn_chart["text"] = "Open Chart Window"
+        # self.btn_chart.place(x=0, y=230, width=width, height=30)
+        # self.btn_chart["command"] = self.btn_chart_command
 
         self.btn_settings = tk.Button(self.root)
         self.btn_settings["font"] = font_button
@@ -108,9 +108,9 @@ class MainWindow():
         self.lbl_net_worth_incr["text"] = "User 24hr Net Worth Increase: 11%"
         self.lbl_net_worth_incr.place(x=0, y=65, width=width, height=30)
 
-    def destroy_analysis(self):
-        self.new_window_analysis.destroy()
-        self.btn_chart["state"] = "normal"
+    # def destroy_analysis(self):
+    #     self.new_window_analysis.destroy()
+    #     self.btn_chart["state"] = "normal"
 
     def destroy_wallet(self):
         self.new_window_wallet.destroy()
@@ -129,7 +129,7 @@ class MainWindow():
         self.btn_market["state"] = "normal"
         self.new_window_market = None
 
-    def new_window(self, _class):
+    def new_window(self, _class, **kwargs):
         if _class is WalletWindow:
             self.btn_wallet["state"] = "disabled"
             self.new_window_wallet = tk.Toplevel(self.root)
@@ -137,11 +137,11 @@ class MainWindow():
                 "WM_DELETE_WINDOW", self.destroy_wallet)
             _class(self, self.new_window_wallet)
         if _class is ChartWindow:
-            self.btn_chart["state"] = "disabled"
+            # self.btn_chart["state"] = "disabled"
             self.new_window_analysis = tk.Toplevel(self.root)
-            self.new_window_analysis.protocol(
-                "WM_DELETE_WINDOW", self.destroy_analysis)
-            _class(self, self.new_window_analysis)
+            # self.new_window_analysis.protocol(
+            #     "WM_DELETE_WINDOW", self.destroy_analysis)
+            _class(self, self.new_window_analysis, **kwargs)
         if _class is SettingsWindow:
             self.btn_settings["state"] = "disabled"
             self.new_window_settings = tk.Toplevel(self.root)
@@ -168,8 +168,8 @@ class MainWindow():
     def btn_alerts_command(self):
         self.new_window(AlertsWindow)
 
-    def btn_chart_command(self):
-        self.new_window(ChartWindow)
+    # def btn_chart_command(self):
+    #     self.new_window(ChartWindow)
 
     def btn_wallet_command(self):
         self.new_window(WalletWindow)

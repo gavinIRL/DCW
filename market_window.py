@@ -1,6 +1,7 @@
 import tkinter as tk
 import tkinter.font as tkFont
 from dcw_utils import DCWUtils
+from chart_window import ChartWindow
 
 
 class MarketWindow:
@@ -14,7 +15,6 @@ class MarketWindow:
 
         width = 616
         height = 456
-        width_screen = self.root.winfo_screenwidth()
         alignstr = '%dx%d+%d+%d' % (width, height, 50, 50)
         self.root.geometry(alignstr)
 
@@ -158,15 +158,18 @@ class MarketWindow:
 
             btn_chart = tk.Button(root, text="Chart",
                                   justify="center", font=font_label)
+            btn_chart["command"] = lambda i=i: self.btn_chart_command(i)
             btn_chart.place(x=575, y=55+i*spacing, width=40, height=spacing-2)
-            btn_chart["command"] = lambda: self.btn_chart_command(currency)
             self.btns_chart.append(btn_chart)
         # Then fill out the initial data
         self.startup()
         # And then start updating candles every 2 mins while the window is open
         DCWUtils.update_candles(self.mainwindow, self.root)
 
-    def btn_chart_command(self, currency):
+    def btn_chart_command(self, index):
+        # print(index)
+        self.mainwindow.new_window(
+            _class=ChartWindow, currency=self.currencies[index])
         # Open chart window for the given currency
         pass
 
