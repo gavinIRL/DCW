@@ -14,7 +14,7 @@ class MarketWindow:
 
         # These variables are for storing the latest data
         # Used for opening chart window from scratch and also pushing updates
-        self.candles = []
+        # self.candles = []
         self.prices = []
         for entry in self.currencies:
             self.prices.append(100)
@@ -48,28 +48,28 @@ class MarketWindow:
         self.lbl_heading = tk.Label(self.root)
         self.lbl_heading["font"] = font_heading
         self.lbl_heading["justify"] = "center"
-        self.lbl_heading["text"] = "%24hr"
+        self.lbl_heading["text"] = "24hr"
         self.lbl_heading.place(x=horz_distance, y=35, width=55, height=20)
 
         horz_distance += 60
         self.lbl_heading = tk.Label(self.root)
         self.lbl_heading["font"] = font_heading
         self.lbl_heading["justify"] = "center"
-        self.lbl_heading["text"] = "%1wk"
+        self.lbl_heading["text"] = "1wk"
         self.lbl_heading.place(x=horz_distance, y=35, width=55, height=20)
 
         horz_distance += 60
         self.lbl_heading = tk.Label(self.root)
         self.lbl_heading["font"] = font_heading
         self.lbl_heading["justify"] = "center"
-        self.lbl_heading["text"] = "%1hr"
+        self.lbl_heading["text"] = "1hr"
         self.lbl_heading.place(x=horz_distance, y=35, width=55, height=20)
 
         horz_distance += 60
         self.lbl_heading = tk.Label(self.root)
         self.lbl_heading["font"] = font_heading
         self.lbl_heading["justify"] = "center"
-        self.lbl_heading["text"] = "%5min"
+        self.lbl_heading["text"] = "5min"
         self.lbl_heading.place(x=horz_distance, y=35, width=55, height=20)
 
         horz_distance += 60
@@ -195,7 +195,7 @@ class MarketWindow:
         # Then fill out the initial data
         self.startup()
         # And then start updating candles every 2 mins while the window is open
-        root.after(100, self.update_candles(self.mainwindow, self.root))
+        root.after(1000, self.update_candles(self.mainwindow, self.root))
         # if self.mainwindow:
 
     def btn_chart_command(self, index):
@@ -210,34 +210,46 @@ class MarketWindow:
         fresh_data = dcw.get_tick(self.mainwindow.market_currency_list)
         self.update_all_prices(fresh_data)
 
+    def update_colours(self):
+        # Iterate through the labels and update based on positive/negative
+        pass
+
     def update_all_prices(self, data):
         for pair, price in data.items():
             # print("Pair = "+pair+" , Price= "+price)
             index = self.currencies.index(pair)
             self.labels_current[index]["text"] = str(price)
             self.prices[index] = float(price)
+            # Now need to update each of the % labels also
 
-    def update_percentages_new(self, pair, data_5m, data_1h, data_1w):
+            # And finally do a colour check
+            self.update_colours()
+
+    def update_percentages_new(self, pair, data_5m, data_1h, data_1d, data_1w):
         index = self.currencies.index(pair)
         current = float(self.prices[index])
-        print(data_1w)
-        change_percent_5m = 100*(1-(float(data_5m["Close"])/current))
-        change_percent_1h = 100*(1-(float(data_1h["Close"])/current))
-        change_percent_1w = 100*(1-(float(data_1w["Close"])/current))
+        # print(f"", pair, current, data_1h["Open"],
+        #       data_5m["Open"], data_1w["Open"])
+        change_percent_5m = 100*(1-(float(data_5m["Open"])/current))
+        change_percent_1h = 100*(1-(float(data_1h["Open"])/current))
+        change_percent_1d = 100*(1-(float(data_1d["Open"])/current))
+        change_percent_1w = 100*(1-(float(data_1w["Open"])/current))
         self.labels_change5m[index].configure(text=str(
-            format(change_percent_5m, ".3g")))
+            format(change_percent_5m, ".2f"))+"%")
         self.labels_change1h[index].configure(text=str(
-            format(change_percent_1h, ".3g")))
+            format(change_percent_1h, ".2f"))+"%")
         self.labels_change1w[index].configure(text=str(
-            format(change_percent_1w, ".3g")))
+            format(change_percent_1w, ".2f"))+"%")
+        self.labels_change24h[index].configure(text=str(
+            format(change_percent_1d, ".2f"))+"%")
         #print("Working, this is for pair: "+pair)
 
     def candle_thread_handler(self, mw, dcw, pair, sleep_timer):
         time.sleep(sleep_timer)
-        data_5m_1h = dcw.get_candle(pair, "5m", 12)
-        data_1w = dcw.get_candle(pair, "1w", 1)
+        data_5m_1h = dcw.get_candle(pair, "1m", 60)
+        data_1d_1w = dcw.get_candle(pair, "2h", 84)
         mw.mw.update_percentages_new(
-            pair, data_5m_1h[-1], data_5m_1h[0], data_1w[0])
+            pair, data_5m_1h[-5], data_5m_1h[0], data_1d_1w[-12], data_1d_1w[0])
 
     def update_candles(self, mw, root):
         # This is last thing called after opening market window
