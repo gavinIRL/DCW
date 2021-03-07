@@ -16,8 +16,20 @@ class MarketWindow:
         # Used for opening chart window from scratch and also pushing updates
         # self.candles = []
         self.prices = []
+        self.base_5min = []
+        self.base_1hr = []
+        self.base_24hr = []
+        self.base_1wk = []
         for entry in self.currencies:
             self.prices.append(100)
+            self.base_5min.append(100)
+            self.base_1hr.append(100)
+            self.base_24hr.append(100)
+            self.base_1wk.append(100)
+            # might do something with entry after
+        # This is used to reduce amount of updates of longer timeframes
+        self.colour_update_counter = 1
+        self.ticker_update_counter = 1
 
         font_heading = tkFont.Font(family='Times', size=10, weight="bold")
         font_label = tkFont.Font(family='Times', size=10)
@@ -212,7 +224,22 @@ class MarketWindow:
 
     def update_colours(self):
         # Iterate through the labels and update based on positive/negative
-        pass
+        if self.colour_update_counter == 1:
+            pass
+            # Update all
+        if self.colour_update_counter % 3 == 0:
+            pass
+            # Update 5min
+        if self.colour_update_counter % 7 == 0:
+            pass
+            # Update 1hr
+        if self.colour_update_counter % 17 == 0:
+            pass
+            # Update 24hr
+        if self.colour_update_counter % 53 == 0:
+            self.colour_update_counter = 0
+            # Update 1w
+        self.colour_update_counter += 1
 
     def update_all_prices(self, data):
         for pair, price in data.items():
@@ -220,16 +247,36 @@ class MarketWindow:
             index = self.currencies.index(pair)
             self.labels_current[index]["text"] = str(price)
             self.prices[index] = float(price)
-            # Now need to update each of the % labels also
-
-            # And finally do a colour check
-            self.update_colours()
+            # Now update the percentages also depending on the ticker counter
+            if self.ticker_update_counter % 3 == 0:
+                base_5m = self.base_5min[index]
+                change_percent_5m = 100*(1-(base_5m/float(price)))
+                self.labels_change5m[index].configure(text=str(
+                    format(change_percent_5m, ".2f"))+"%")
+            if self.ticker_update_counter % 7 == 0:
+                base_1h = self.base_1hr[index]
+                change_percent_1h = 100*(1-(base_1h/float(price)))
+                self.labels_change1h[index].configure(text=str(
+                    format(change_percent_1h, ".2f"))+"%")
+            if self.ticker_update_counter % 17 == 0:
+                base_1d = self.base_24hr[index]
+                change_percent_1d = 100*(1-(base_1d/float(price)))
+                self.labels_change24h[index].configure(text=str(
+                    format(change_percent_1d, ".2f"))+"%")
+            if self.ticker_update_counter % 53 == 0:
+                self.ticker_update_counter = 0
+                base_1w = self.base_1wk[index]
+                change_percent_1w = 100*(1-(base_1w/float(price)))
+                self.labels_change1w[index].configure(text=str(
+                    format(change_percent_1w, ".2f"))+"%")
+        # And finally do a colour check
+        self.update_colours()
+        self.ticker_update_counter += 1
 
     def update_percentages_new(self, pair, data_5m, data_1h, data_1d, data_1w):
         index = self.currencies.index(pair)
         current = float(self.prices[index])
-        # print(f"", pair, current, data_1h["Open"],
-        #       data_5m["Open"], data_1w["Open"])
+
         change_percent_5m = 100*(1-(float(data_5m["Open"])/current))
         change_percent_1h = 100*(1-(float(data_1h["Open"])/current))
         change_percent_1d = 100*(1-(float(data_1d["Open"])/current))
@@ -242,7 +289,11 @@ class MarketWindow:
             format(change_percent_1w, ".2f"))+"%")
         self.labels_change24h[index].configure(text=str(
             format(change_percent_1d, ".2f"))+"%")
-        #print("Working, this is for pair: "+pair)
+        # Then update the base values to tick against
+        self.base_5min[index] = float(data_5m["Open"])
+        self.base_1hr[index] = float(data_1h["Open"])
+        self.base_24hr[index] = float(data_1d["Open"])
+        self.base_1wk[index] = float(data_1w["Open"])
 
     def candle_thread_handler(self, mw, dcw, pair, sleep_timer):
         time.sleep(sleep_timer)
