@@ -28,7 +28,7 @@ class MarketWindow:
             self.base_1wk.append(100)
             # might do something with entry after
         # This is used to reduce amount of updates of longer timeframes
-        self.colour_update_counter = 1
+        self.colour_update_counter = -2
         self.ticker_update_counter = 1
 
         font_heading = tkFont.Font(family='Times', size=10, weight="bold")
@@ -223,21 +223,57 @@ class MarketWindow:
         self.update_all_prices(fresh_data)
 
     def update_colours(self):
+        labels = [self.labels_change5m, self.labels_change1h,
+                  self.labels_change24h, self.labels_change1w]
+        threshold = [0.25, 0.5, 1, 2.5]  # These are for 5m, 1h, 1d, 1w
         # Iterate through the labels and update based on positive/negative
-        if self.colour_update_counter == 1:
-            pass
+        # But only after the first two rounds of updates
+        if self.colour_update_counter == 0:
             # Update all
+            for index, currency in enumerate(self.currencies):
+                for i, label in enumerate(labels):
+                    if float(label[index]["text"].replace("%", "")) > threshold[i]:
+                        label[index].configure(bg="green")
+                    elif float(label[index]["text"].replace("%", "")) < -1 * threshold[i]:
+                        label[index].configure(bg="red")
+                    else:
+                        label[index].configure(bg="grey")
         if self.colour_update_counter % 3 == 0:
-            pass
             # Update 5min
-        if self.colour_update_counter % 7 == 0:
-            pass
+            for index, currency in enumerate(self.currencies):
+                if float(self.labels_change5m[index]["text"].replace("%", "")) > threshold[0]:
+                    self.labels_change5m[index].configure(bg="green")
+                elif float(self.labels_change5m[index]["text"].replace("%", "")) < -1*threshold[0]:
+                    self.labels_change5m[index].configure(bg="red")
+                else:
+                    self.labels_change5m[index].configure(bg="grey")
+        if self.colour_update_counter % 6 == 0:
+            for index, currency in enumerate(self.currencies):
+                if float(self.labels_change1h[index]["text"].replace("%", "")) > threshold[1]:
+                    self.labels_change1h[index].configure(bg="green")
+                elif float(self.labels_change1h[index]["text"].replace("%", "")) < -1*threshold[1]:
+                    self.labels_change1h[index].configure(bg="red")
+                else:
+                    self.labels_change1h[index].configure(bg="grey")
             # Update 1hr
-        if self.colour_update_counter % 17 == 0:
-            pass
+        if self.colour_update_counter % 12 == 0:
+            for index, currency in enumerate(self.currencies):
+                if float(self.labels_change24h[index]["text"].replace("%", "")) > threshold[2]:
+                    self.labels_change24h[index].configure(bg="green")
+                elif float(self.labels_change24h[index]["text"].replace("%", "")) < -1*threshold[2]:
+                    self.labels_change24h[index].configure(bg="red")
+                else:
+                    self.labels_change24h[index].configure(bg="grey")
             # Update 24hr
-        if self.colour_update_counter % 53 == 0:
-            self.colour_update_counter = 0
+        if self.colour_update_counter % 12 == 0:
+            self.colour_update_counter = 1
+            for index, currency in enumerate(self.currencies):
+                if float(self.labels_change1w[index]["text"].replace("%", "")) > threshold[3]:
+                    self.labels_change1w[index].configure(bg="green")
+                elif float(self.labels_change1w[index]["text"].replace("%", "")) < -1*threshold[3]:
+                    self.labels_change1w[index].configure(bg="red")
+                else:
+                    self.labels_change1w[index].configure(bg="grey")
             # Update 1w
         self.colour_update_counter += 1
 
