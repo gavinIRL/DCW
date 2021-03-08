@@ -28,7 +28,7 @@ class MarketWindow:
             self.base_1wk.append(100)
             # might do something with entry after
         # This is used to reduce amount of updates of longer timeframes
-        self.colour_update_counter = -2
+        self.colour_update_counter = -3
         self.ticker_update_counter = 1
 
         font_heading = tkFont.Font(family='Times', size=10, weight="bold")
@@ -237,7 +237,7 @@ class MarketWindow:
                     elif float(label[index]["text"].replace("%", "")) < -1 * threshold[i]:
                         label[index].configure(bg="red")
                     else:
-                        label[index].configure(bg="grey")
+                        label[index].configure(bg="white")
         if self.colour_update_counter % 3 == 0:
             # Update 5min
             for index, currency in enumerate(self.currencies):
@@ -246,7 +246,7 @@ class MarketWindow:
                 elif float(self.labels_change5m[index]["text"].replace("%", "")) < -1*threshold[0]:
                     self.labels_change5m[index].configure(bg="red")
                 else:
-                    self.labels_change5m[index].configure(bg="grey")
+                    self.labels_change5m[index].configure(bg="white")
         if self.colour_update_counter % 6 == 0:
             for index, currency in enumerate(self.currencies):
                 if float(self.labels_change1h[index]["text"].replace("%", "")) > threshold[1]:
@@ -254,7 +254,7 @@ class MarketWindow:
                 elif float(self.labels_change1h[index]["text"].replace("%", "")) < -1*threshold[1]:
                     self.labels_change1h[index].configure(bg="red")
                 else:
-                    self.labels_change1h[index].configure(bg="grey")
+                    self.labels_change1h[index].configure(bg="white")
             # Update 1hr
         if self.colour_update_counter % 12 == 0:
             for index, currency in enumerate(self.currencies):
@@ -263,7 +263,7 @@ class MarketWindow:
                 elif float(self.labels_change24h[index]["text"].replace("%", "")) < -1*threshold[2]:
                     self.labels_change24h[index].configure(bg="red")
                 else:
-                    self.labels_change24h[index].configure(bg="grey")
+                    self.labels_change24h[index].configure(bg="white")
             # Update 24hr
         if self.colour_update_counter % 12 == 0:
             self.colour_update_counter = 1
@@ -273,7 +273,7 @@ class MarketWindow:
                 elif float(self.labels_change1w[index]["text"].replace("%", "")) < -1*threshold[3]:
                     self.labels_change1w[index].configure(bg="red")
                 else:
-                    self.labels_change1w[index].configure(bg="grey")
+                    self.labels_change1w[index].configure(bg="white")
             # Update 1w
         self.colour_update_counter += 1
 
