@@ -32,7 +32,7 @@ class MainWindow():
         # this will hold the marketwindow itself
         self.mw = None
         # set variables that hold the settings
-        self.update_time = 2000
+        self.update_time = 1000
         self.market_currency_list = [
             "BTCUSDT", "ETHUSDT", "ADAUSDT", "BNBUSDT", "DOTUSDT", "XRPUSDT", "LTCUSDT", "XLMUSDT",
             "BCHUSDT", "DOGEUSDT", "XEMUSDT", "ATOMUSDT", "XMRUSDT", "EOSUSDT", "TRXUSDT"]
@@ -227,7 +227,7 @@ if __name__ == "__main__":
         # Perform an update of the information
         # These are all either placeholder or call placeholder functions
         # If the market window isn't open then update at a slower rate of once per 15 seconds
-        ticker_time = 7500
+        ticker_time = 5000
         if MainWindow.new_window_market != None:
             ticker_time = MainWindow.update_time
             # Then update the prices in the market window
