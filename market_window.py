@@ -30,6 +30,8 @@ class MarketWindow:
         # This is used to reduce amount of updates of longer timeframes
         self.colour_update_counter = -3
         self.ticker_update_counter = 1
+        # These are for holding the RSI recent values
+        self.last_15_opens = []
 
         font_heading = tkFont.Font(family='Times', size=10, weight="bold")
         font_label = tkFont.Font(family='Times', size=10)
@@ -222,6 +224,29 @@ class MarketWindow:
         fresh_data = dcw.get_tick(self.mainwindow.market_currency_list)
         self.update_all_prices(fresh_data)
 
+    def rsi_thread_handler(self, mw, dcw, pairindex, n):
+        data = self.last_15_opens[pairindex]
+        response = dcw.get_rsi(data, n)
+        if n == 6:
+            # update the relevant label
+            pass
+        elif n == 14:
+            # update the relevant label
+            pass
+
+    def update_rsi(self, mw, dcw):
+        # Update the RSI values every second ticker update
+        if self.ticker_update_counter % 2 == 0:
+            for i, pair in enumerate(self.mainwindow.market_currency_list):
+                t = threading.Thread(target=self.rsi_thread_handler,
+                                     args=(mw, dcw, i, 6))
+                self.mainwindow.threads.append(t)
+                t.start()
+                t2 = threading.Thread(target=self.rsi_thread_handler,
+                                      args=(mw, dcw, i, 14))
+                self.mainwindow.threads.append(t2)
+                t2.start()
+
     def update_colours(self):
         labels = [self.labels_change5m, self.labels_change1h,
                   self.labels_change24h, self.labels_change1w]
@@ -307,6 +332,8 @@ class MarketWindow:
                     format(change_percent_1w, ".2f"))+"%")
         # And finally do a colour check
         self.update_colours()
+        # And a RSI update also
+        self.update_rsi()
         self.ticker_update_counter += 1
 
     def update_percentages_new(self, pair, data_5m, data_1h, data_1d, data_1w):
