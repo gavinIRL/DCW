@@ -7,7 +7,7 @@ import threading
 
 
 class MarketWindow:
-    def __init__(self, mainwindow, root, currencies=["BTC", "ETH", "IOTA"]):
+    def __init__(self, mainwindow, root, currencies):
         self.mainwindow = mainwindow
         self.root = root
         self.currencies = currencies

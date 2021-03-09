@@ -154,6 +154,7 @@ class MainWindow():
         self.new_window_market.destroy()
         self.btn_market["state"] = "normal"
         self.new_window_market = None
+        self.mw = None
 
     def new_window(self, _class, **kwargs):
         if _class is WalletWindow:
