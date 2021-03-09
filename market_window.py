@@ -283,7 +283,7 @@ class MarketWindow:
                     self.labels_change5m[index].configure(fg="red")
                 else:
                     self.labels_change5m[index].configure(fg="black")
-        if self.colour_update_counter % 3 == 0:
+        if self.colour_update_counter % 2 == 0:
             for index, currency in enumerate(self.currencies):
                 if float(self.labels_change1h[index]["text"].replace("%", "")) > threshold[1]:
                     self.labels_change1h[index].configure(fg="green")
@@ -292,7 +292,7 @@ class MarketWindow:
                 else:
                     self.labels_change1h[index].configure(fg="black")
             # Update 1hr
-        if self.colour_update_counter % 6 == 0:
+        if self.colour_update_counter % 4 == 0:
             for index, currency in enumerate(self.currencies):
                 if float(self.labels_change24h[index]["text"].replace("%", "")) > threshold[2]:
                     self.labels_change24h[index].configure(fg="green")
@@ -301,7 +301,7 @@ class MarketWindow:
                 else:
                     self.labels_change24h[index].configure(fg="black")
             # Update 24hr
-        if self.colour_update_counter % 6 == 0:
+        if self.colour_update_counter % 4 == 0:
             self.colour_update_counter = 1
             for index, currency in enumerate(self.currencies):
                 if float(self.labels_change1w[index]["text"].replace("%", "")) > threshold[3]:
@@ -325,17 +325,17 @@ class MarketWindow:
                 change_percent_5m = 100*(1-(base_5m/float(price)))
                 self.labels_change5m[index].configure(text=str(
                     format(change_percent_5m, ".2f"))+"%")
-            if self.ticker_update_counter % 3 == 0:
+            if self.ticker_update_counter % 2 == 0:
                 base_1h = self.base_1hr[index]
                 change_percent_1h = 100*(1-(base_1h/float(price)))
                 self.labels_change1h[index].configure(text=str(
                     format(change_percent_1h, ".2f"))+"%")
-            if self.ticker_update_counter % 6 == 0:
+            if self.ticker_update_counter % 4 == 0:
                 base_1d = self.base_24hr[index]
                 change_percent_1d = 100*(1-(base_1d/float(price)))
                 self.labels_change24h[index].configure(text=str(
                     format(change_percent_1d, ".2f"))+"%")
-            if self.ticker_update_counter % 6 == 0:
+            if self.ticker_update_counter % 4 == 0:
                 self.ticker_update_counter = 0
                 base_1w = self.base_1wk[index]
                 change_percent_1w = 100*(1-(base_1w/float(price)))
@@ -357,7 +357,7 @@ class MarketWindow:
         self.update_rsi()
         self.ticker_update_counter += 1
 
-    def update_percentages_new(self, pair, data_5m, data_1h, data_1d, data_1w):
+    def update_percentages_new(self, pair, data_5m, data_1h, data_1d, data_1w, data_hilo):
         index = self.currencies.index(pair)
         current = float(self.prices[index])
 
@@ -378,6 +378,16 @@ class MarketWindow:
         self.base_1hr[index] = float(data_1h["Open"])
         self.base_24hr[index] = float(data_1d["Open"])
         self.base_1wk[index] = float(data_1w["Open"])
+        # Then update the high and low values
+        day_high = float(data_hilo["High"])
+        day_low = float(data_hilo["Low"])
+        self.labels_high[index].configure(text=day_high)
+        self.labels_low[index].configure(text=day_low)
+        # And also update the mainwindow hilo if pair is bitcoin
+        if pair == "BTCUSDT":
+            hilo_text = "Bitcoin: 24hr high $" + \
+                str(day_high)+" | low $"+str(day_low)
+            self.mainwindow.lbl_bitcoin_hilo.configure(text=hilo_text)
 
     def candle_thread_handler(self, mw, dcw, pair, sleep_timer):
         time.sleep(sleep_timer)
@@ -385,8 +395,9 @@ class MarketWindow:
         # Most recent values are always last
         data_5m_1h = dcw.get_candle(pair, "1m", 80)
         data_1d_1w = dcw.get_candle(pair, "2h", 84)
+        data_hilo = dcw.get_candle(pair, "1d", 1)
         mw.mw.update_percentages_new(
-            pair, data_5m_1h[-5], data_5m_1h[20], data_1d_1w[-12], data_1d_1w[0])
+            pair, data_5m_1h[-5], data_5m_1h[20], data_1d_1w[-12], data_1d_1w[0], data_hilo[0])
         # then update the rsi list
         list_every_fifth_value = data_5m_1h[::5]
         open_list = []

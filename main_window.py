@@ -122,22 +122,6 @@ class MainWindow():
         self.lbl_net_worth_incr["text"] = "User 24hr Net Worth Increase: 11%"
         self.lbl_net_worth_incr.place(x=0, y=65, width=width, height=30)
 
-    # Test functions:
-    # def worker(self, num):
-    #     time.sleep(5)
-    #     print("Task #" + str(num))
-
-    # def tb_click(self):
-    #     self.queue = queue.Queue()
-    #     for i in range(6):
-    #         t = threading.Thread(target=self.worker, args=(i,))
-    #         self.threads.append(t)
-    #         t.start()
-
-    # def destroy_analysis(self):
-    #     self.new_window_analysis.destroy()
-    #     self.btn_chart["state"] = "normal"
-
     def destroy_wallet(self):
         self.new_window_wallet.destroy()
         self.btn_wallet["state"] = "normal"
