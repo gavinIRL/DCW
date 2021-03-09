@@ -189,7 +189,7 @@ class DCWUtils():
         pass
 
     @nb.jit(fastmath=True, nopython=True)
-    def calculate_rsi(list, deltas, avg_gain, avg_loss, n):
+    def calculate_rsi(array, deltas, avg_gain, avg_loss, n):
 
         # Use Wilder smoothing method
         def up(x): return x if x > 0 else 0
@@ -200,26 +200,23 @@ class DCWUtils():
             avg_loss = ((avg_loss * (n-1)) + down(d)) / n
             if avg_loss != 0:
                 rs = avg_gain / avg_loss
-                list[i] = 100 - (100 / (1 + rs))
+                array[i] = 100 - (100 / (1 + rs))
             else:
-                list[i] = 100
+                array[i] = 100
             i += 1
 
-        return list
+        return array
 
-    def get_rsi(list, n=14):
-
-        deltas = np.append([0], np.diff(list))
-
+    def get_rsi(array, n=2):
+        deltas = np.append([0], np.diff(array))
         avg_gain = np.sum(deltas[1:n+1].clip(min=0)) / n
         avg_loss = -np.sum(deltas[1:n+1].clip(max=0)) / n
-
-        list = np.empty(deltas.shape[0])
-        list.fill(np.nan)
-        list = DCWUtils.calculate_rsi(list, deltas, avg_gain, avg_loss, n)
+        array = np.empty(deltas.shape[0])
+        array.fill(np.nan)
+        array = DCWUtils.calculate_rsi(array, deltas, avg_gain, avg_loss, n)
         # Now remove the NaN's when returning
-        list = list[~np.isnan(list)]
-        return list
+        array = array[~np.isnan(array)]
+        return array
 
     @staticmethod
     def checkSettingsFileExists():
@@ -235,11 +232,12 @@ class DCWUtils():
 
 if __name__ == "__main__":
     # playground for testing
-    curlist = [
-        "BTCUSDT", "ETHUSDT", "ADAUSDT", "BNBUSDT", "DOTUSDT", "XRPUSDT", "LTCUSDT"]
     dcw = DCWUtils("Binance")
     #print(dcw.request_api("candles/trade:1m:tBTCUSD/hist?limit=10", True))
     #output = dcw.get_coin_candle(target="High")
-    output = dcw.get_candle("BTCUSDT", "1m", 10)
-    for line in output:
-        print(line)
+    #output = dcw.get_candle("BTCUSDT", "1m", 10)
+    input = [2, 1.5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+             1, 2, 3, 4, 5, 6, 4, 5, 6, 5, 6, 5, 6, 5, 4, 3, 2, 1, 0.5, 4, 9]
+    print(input)
+    output = DCWUtils.get_rsi(input, n=6)
+    print(output)

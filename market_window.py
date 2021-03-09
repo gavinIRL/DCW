@@ -11,7 +11,8 @@ class MarketWindow:
         self.mainwindow = mainwindow
         self.root = root
         self.currencies = currencies
-
+        # These are for holding the RSI recent values
+        self.last_15_opens = []
         # These variables are for storing the latest data
         # Used for opening chart window from scratch and also pushing updates
         # self.candles = []
@@ -26,12 +27,11 @@ class MarketWindow:
             self.base_1hr.append(100)
             self.base_24hr.append(100)
             self.base_1wk.append(100)
+            self.last_15_opens.append([100, 200])
             # might do something with entry after
         # This is used to reduce amount of updates of longer timeframes
         self.colour_update_counter = -3
         self.ticker_update_counter = 1
-        # These are for holding the RSI recent values
-        self.last_15_opens = []
 
         font_heading = tkFont.Font(family='Times', size=10, weight="bold")
         font_label = tkFont.Font(family='Times', size=10)
@@ -224,26 +224,36 @@ class MarketWindow:
         fresh_data = dcw.get_tick(self.mainwindow.market_currency_list)
         self.update_all_prices(fresh_data)
 
-    def rsi_thread_handler(self, mw, dcw, pairindex, n):
-        data = self.last_15_opens[pairindex]
-        response = dcw.get_rsi(data, n)
-        if n == 6:
-            # update the relevant label
-            pass
-        elif n == 14:
-            # update the relevant label
-            pass
+    def rsi_thread_handler(self, mw, pairindex, n_value):
+        if len(self.last_15_opens[pairindex]) > 3:
+            data = self.last_15_opens[pairindex]
+            # there are 15 values sent, the correct one is the last one
+            value = DCWUtils.get_rsi(data, n=n_value)[-1]
+            # value = response[-1]
+            colour = "black"
+            if value < 30:
+                colour = "green"
+            elif value > 70:
+                colour = "red"
+            if n_value == 6:
+                self.labels_rsi6[pairindex].configure(text=str(
+                    format(value, ".2f")), fg=colour)
+                # print(response)
+            elif n_value == 14:
+                self.labels_rsi14[pairindex].configure(text=str(
+                    format(value, ".2f")), fg=colour)
+                pass
 
-    def update_rsi(self, mw, dcw):
+    def update_rsi(self):
         # Update the RSI values every second ticker update
         if self.ticker_update_counter % 2 == 0:
             for i, pair in enumerate(self.mainwindow.market_currency_list):
                 t = threading.Thread(target=self.rsi_thread_handler,
-                                     args=(mw, dcw, i, 6))
+                                     args=(self.mainwindow, i, 6))
                 self.mainwindow.threads.append(t)
                 t.start()
                 t2 = threading.Thread(target=self.rsi_thread_handler,
-                                      args=(mw, dcw, i, 14))
+                                      args=(self.mainwindow, i, 14))
                 self.mainwindow.threads.append(t2)
                 t2.start()
 
@@ -258,47 +268,47 @@ class MarketWindow:
             for index, currency in enumerate(self.currencies):
                 for i, label in enumerate(labels):
                     if float(label[index]["text"].replace("%", "")) > threshold[i]:
-                        label[index].configure(bg="green")
+                        label[index].configure(fg="green")
                     elif float(label[index]["text"].replace("%", "")) < -1 * threshold[i]:
-                        label[index].configure(bg="red")
+                        label[index].configure(fg="red")
                     else:
-                        label[index].configure(bg="white")
+                        label[index].configure(fg="black")
         if self.colour_update_counter % 3 == 0:
             # Update 5min
             for index, currency in enumerate(self.currencies):
                 if float(self.labels_change5m[index]["text"].replace("%", "")) > threshold[0]:
-                    self.labels_change5m[index].configure(bg="green")
+                    self.labels_change5m[index].configure(fg="green")
                 elif float(self.labels_change5m[index]["text"].replace("%", "")) < -1*threshold[0]:
-                    self.labels_change5m[index].configure(bg="red")
+                    self.labels_change5m[index].configure(fg="red")
                 else:
-                    self.labels_change5m[index].configure(bg="white")
+                    self.labels_change5m[index].configure(fg="black")
         if self.colour_update_counter % 6 == 0:
             for index, currency in enumerate(self.currencies):
                 if float(self.labels_change1h[index]["text"].replace("%", "")) > threshold[1]:
-                    self.labels_change1h[index].configure(bg="green")
+                    self.labels_change1h[index].configure(fg="green")
                 elif float(self.labels_change1h[index]["text"].replace("%", "")) < -1*threshold[1]:
-                    self.labels_change1h[index].configure(bg="red")
+                    self.labels_change1h[index].configure(fg="red")
                 else:
-                    self.labels_change1h[index].configure(bg="white")
+                    self.labels_change1h[index].configure(fg="black")
             # Update 1hr
         if self.colour_update_counter % 12 == 0:
             for index, currency in enumerate(self.currencies):
                 if float(self.labels_change24h[index]["text"].replace("%", "")) > threshold[2]:
-                    self.labels_change24h[index].configure(bg="green")
+                    self.labels_change24h[index].configure(fg="green")
                 elif float(self.labels_change24h[index]["text"].replace("%", "")) < -1*threshold[2]:
-                    self.labels_change24h[index].configure(bg="red")
+                    self.labels_change24h[index].configure(fg="red")
                 else:
-                    self.labels_change24h[index].configure(bg="white")
+                    self.labels_change24h[index].configure(fg="black")
             # Update 24hr
         if self.colour_update_counter % 12 == 0:
             self.colour_update_counter = 1
             for index, currency in enumerate(self.currencies):
                 if float(self.labels_change1w[index]["text"].replace("%", "")) > threshold[3]:
-                    self.labels_change1w[index].configure(bg="green")
+                    self.labels_change1w[index].configure(fg="green")
                 elif float(self.labels_change1w[index]["text"].replace("%", "")) < -1*threshold[3]:
-                    self.labels_change1w[index].configure(bg="red")
+                    self.labels_change1w[index].configure(fg="red")
                 else:
-                    self.labels_change1w[index].configure(bg="white")
+                    self.labels_change1w[index].configure(fg="black")
             # Update 1w
         self.colour_update_counter += 1
 
@@ -360,11 +370,12 @@ class MarketWindow:
 
     def candle_thread_handler(self, mw, dcw, pair, sleep_timer):
         time.sleep(sleep_timer)
-        # Getting smaller chunks to ensure
-        data_5m_1h = dcw.get_candle(pair, "1m", 75)
+        # Getting smaller chunks
+        # Most recent values are always last
+        data_5m_1h = dcw.get_candle(pair, "1m", 80)
         data_1d_1w = dcw.get_candle(pair, "2h", 84)
         mw.mw.update_percentages_new(
-            pair, data_5m_1h[-5], data_5m_1h[15], data_1d_1w[-12], data_1d_1w[0])
+            pair, data_5m_1h[-5], data_5m_1h[20], data_1d_1w[-12], data_1d_1w[0])
         # then update the rsi list
         list_every_fifth_value = data_5m_1h[::5]
         open_list = []
