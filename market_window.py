@@ -360,10 +360,17 @@ class MarketWindow:
 
     def candle_thread_handler(self, mw, dcw, pair, sleep_timer):
         time.sleep(sleep_timer)
-        data_5m_1h = dcw.get_candle(pair, "1m", 60)
+        # Getting smaller chunks to ensure
+        data_5m_1h = dcw.get_candle(pair, "1m", 75)
         data_1d_1w = dcw.get_candle(pair, "2h", 84)
         mw.mw.update_percentages_new(
-            pair, data_5m_1h[-5], data_5m_1h[0], data_1d_1w[-12], data_1d_1w[0])
+            pair, data_5m_1h[-5], data_5m_1h[15], data_1d_1w[-12], data_1d_1w[0])
+        # then update the rsi list
+        list_every_fifth_value = data_5m_1h[::5]
+        open_list = []
+        for line in list_every_fifth_value:
+            open_list.append(float(line["Open"]))
+        self.last_15_opens[self.currencies.index(pair)] = open_list
 
     def update_candles(self, mw, root):
         # This is last thing called after opening market window
