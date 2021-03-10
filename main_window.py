@@ -36,6 +36,11 @@ class MainWindow():
         self.market_currency_list = [
             "BTCUSDT", "ETHUSDT", "ADAUSDT", "BNBUSDT", "DOTUSDT", "XRPUSDT", "LTCUSDT", "XLMUSDT",
             "BCHUSDT", "DOGEUSDT", "XEMUSDT", "ATOMUSDT", "XMRUSDT", "EOSUSDT", "TRXUSDT"]
+        # This is for csv logging
+        self.log_loop_tracker = -5
+        self.fresh_prices = []
+        for curr in self.market_currency_list:
+            self.fresh_prices.append(1.2)
         # set fonts
         font_button = tkFont.Font(family='Times', size=12)
         font_label = tkFont.Font(family='Times', size=12)
@@ -219,14 +224,33 @@ if __name__ == "__main__":
         if MainWindow.new_window_market != None:
             ticker_time = MainWindow.update_time
             # Then update the prices in the market window
+            current_time = time.time()
             fresh_data = dcw.get_tick(MainWindow.market_currency_list)
+            # Prepare data for logging in csv
+
+            for pair, price in fresh_data.items():
+                index = MainWindow.market_currency_list.index(pair)
+                MainWindow.fresh_prices[index] = price
+            # Update the relevant windows
             MainWindow.mw.update_all_prices(fresh_data)
             MainWindow.update_bitcoin_price(fresh_data["BTCUSDT"])
-            # And also update the bitcoin price on mainwindow
+            # And then send the data for logging after the first few loops
+            # Will eventually make it so that it starts appending to a new file every hour
+            if MainWindow.log_loop_tracker > 0:
+                dcw.csv_logger(pairs=MainWindow.market_currency_list, time_list=[
+                    current_time], existing_data=[MainWindow.fresh_prices])
+            # print(MainWindow.fresh_prices)
+            MainWindow.log_loop_tracker += 1
 
         # Otherwise grab the data and update mainwindow only
         else:
             MainWindow.update_bitcoin_price(dcw.get_tick("BTCUSDT"))
+            # And clear any leftover buffer data from previous windows
+            MainWindow.log_loop_tracker = -5
+            dcw.buffer_counter = 0
+            dcw.buffer_data = []
+            dcw.buffer_times = []
+            dcw.log_start_time = 0
 
         root.after(ticker_time, update_prices)
 

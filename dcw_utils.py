@@ -32,6 +32,7 @@ class DCWUtils():
         self.buffer_counter = 0
         self.log_start_time = 0
         self.buffer_data = []
+        self.buffer_times = []
 
     def request_api(self, suffix):
         url = self.url_base + suffix
@@ -182,6 +183,7 @@ class DCWUtils():
             return False
 
     def csv_logger(self, pairs: list, time_list=False, existing_data=False, buffer=10, path=False):
+        # This can accept multiple lines of data at once
         start_time = None
         new_data = []
         if not existing_data:
@@ -191,42 +193,56 @@ class DCWUtils():
             pass
         else:
             start_time = time_list[0]
-            new_data = existing_data
+            new_data = existing_data[0]
         # Then check whether to use the start time value
+        clean_format_time = str(self.convert_ms_to_datetime(
+            start_time)).replace(" ", "-").split(".")[0]
+        clean_format_time = clean_format_time.replace(":", "")
         if self.log_start_time == 0:
-            self.log_start_time = start_time
-        # Check if the lists are the same length
-        if not len(time_list) == len(existing_data[0]):
-            print("Lists are not same length, aborting")
-            return False
+            self.log_start_time = clean_format_time
+            print("Choosing time "+clean_format_time)
         # Then update the buffer data
-        self.buffer_data.append(new_data)
+        self.buffer_times.append(clean_format_time)
+        self.buffer_data.append(new_data.copy())
         # Then write to the files every time 10 ticks are saved up
         if self.buffer_counter >= buffer:
             self.buffer_counter = 0
             for i, pair in enumerate(pairs):
-                file_time = self.convert_ms_to_datetime(self.log_start_time)
-                filename = str(pair)+"-"+str(file_time)+".csv"
+                filename = str(pair)+"-"+str(self.log_start_time)+".csv"
                 if path:
-                    filename = path+filename
-                with open(filename, "w") as file:
-                    for j, line in enumerate(time_list):
-                        file.write(str(line)+","+str(new_data[i][j]))
+                    filename = str(path)+str(filename)
+                else:
+                    filename = "D:/DCWLog/" + filename
+                # Check if file already exists
+                if not os.path.isfile(filename):
+                    with open(filename, "w") as file:
+                        for j, line in enumerate(self.buffer_times):
+                            csv_data = self.buffer_data[j][i]
+                            file.write(str(line)+","+str(csv_data)+"\n")
+                # Otherwise append
+                else:
+                    with open(filename, "a") as file:
+                        for j, line in enumerate(self.buffer_times):
+                            csv_data = self.buffer_data[j][i]
+                            file.write(str(line)+","+str(csv_data)+"\n")
+            # Then reset the buffer
+            self.buffer_times = []
+            self.buffer_data = []
         else:
             self.buffer_counter += 1
 
     def get_net_worth(self, currency_list):
         pass
 
-    @staticmethod
+    @ staticmethod
     def get_wallet():
         pass
 
-    @staticmethod
+    @ staticmethod
     def set_wallet(currency_list):
         pass
 
-    @nb.jit(fastmath=True, nopython=True)
+    @ nb.jit(fastmath=True, nopython=True)
     def calculate_rsi(array, deltas, avg_gain, avg_loss, n):
 
         # Use Wilder smoothing method
@@ -256,7 +272,7 @@ class DCWUtils():
         array = array[~np.isnan(array)]
         return array
 
-    @staticmethod
+    @ staticmethod
     def checkSettingsFileExists():
         # check if file exists
         if os.path.isfile("settings.cfg"):
@@ -271,9 +287,9 @@ class DCWUtils():
 if __name__ == "__main__":
     # playground for testing
     dcw = DCWUtils("Binance")
-    #print(dcw.request_api("candles/trade:1m:tBTCUSD/hist?limit=10", True))
-    #output = dcw.get_coin_candle(target="High")
-    #output = dcw.get_candle("BTCUSDT", "1m", 10)
+    # print(dcw.request_api("candles/trade:1m:tBTCUSD/hist?limit=10", True))
+    # output = dcw.get_coin_candle(target="High")
+    # output = dcw.get_candle("BTCUSDT", "1m", 10)
     input = [2, 1.5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
              1, 2, 3, 4, 5, 6, 4, 5, 6, 5, 6, 5, 6, 5, 4, 3, 2, 1, 0.5, 4, 9]
     print(input)
