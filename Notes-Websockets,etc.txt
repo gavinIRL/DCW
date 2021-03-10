@@ -87,3 +87,9 @@ Bought Price => Price the currency was bought for
 Bought Date => Date the currency was bought
 
 The above information will be used to determine max worth, PnL trend, etc.
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+----------------------------Wallet History Format:----------------------------
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+The rows will be of the following format:
+Currency, Date, Amount, Price, buy/sell
+Most recent will be at the bottom

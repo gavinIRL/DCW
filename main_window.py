@@ -41,6 +41,8 @@ class MainWindow():
         self.fresh_prices = []
         for curr in self.market_currency_list:
             self.fresh_prices.append(1.2)
+        # This is for holding the wallet details
+        self.current_wallet = []
         # set fonts
         font_button = tkFont.Font(family='Times', size=12)
         font_label = tkFont.Font(family='Times', size=12)

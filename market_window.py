@@ -45,7 +45,7 @@ class MarketWindow:
         self.root.geometry(alignstr)
 
         self.root.resizable(width=False, height=False)
-        self.root.title("Settings")
+        self.root.title("Market")
 
         self.lbl_title = tk.Label(self.root)
         self.lbl_title["font"] = font_title
