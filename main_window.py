@@ -203,10 +203,13 @@ if __name__ == "__main__":
         # Perform the startup functions such as grabbing settings
         # The prices will be grabbed in update prices so no need to do anything here
         # Only going to update the bitcoin hilo once
-        data = [100, 200, 300]  # need to grab a candle here
-        MainWindow.lbl_bitcoin_hilo["text"] = "Bitcoin: 24hr high $" + \
-            str(data[1]) + " | low $" + str(data[2])
-        # print(dcw.get_tick(MainWindow.market_currency_list))
+        dcw = DCWUtils("Binance")
+        data_hilo = dcw.get_candle("BTCUSDT", "1d", 1)
+        day_high = float(data_hilo["High"])
+        day_low = float(data_hilo["Low"])
+        hilo_text = "Bitcoin: 24hr high $" + \
+            str(day_high)+" | low $"+str(day_low)
+        MainWindow.lbl_bitcoin_hilo["text"] = hilo_text
 
     def update_prices():
         # Perform an update of the information
