@@ -204,7 +204,7 @@ if __name__ == "__main__":
         # The prices will be grabbed in update prices so no need to do anything here
         # Only going to update the bitcoin hilo once
         dcw = DCWUtils("Binance")
-        data_hilo = dcw.get_candle("BTCUSDT", "1d", 1)
+        data_hilo = dcw.get_candle("BTCUSDT", "1d", 1)[0]
         day_high = float(data_hilo["High"])
         day_low = float(data_hilo["Low"])
         hilo_text = "Bitcoin: 24hr high $" + \
