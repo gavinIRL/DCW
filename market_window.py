@@ -288,50 +288,51 @@ class MarketWindow:
         self.update_all_prices(fresh_data)
 
     def rsi_thread_handler(self, pairindex, n_value):
-        if len(self.last_15_opens_5min[pairindex]) > 3:
-            # First do the 5min RSI values
-            data = self.last_15_opens_5min[pairindex]
-            # there are 15 or 16 values sent, the correct one is the last one
-            value = DCWUtils.get_rsi(data, n=n_value)[-1]
-            # if pairindex == 3:
-            # print(data)
-            colour = "black"
-            if value < 30:
-                colour = "green"
-            elif value > 70:
-                colour = "red"
-            if n_value == 6:
-                self.labels_rsi6[pairindex].configure(text=str(
-                    format(value, ".2f")), fg=colour)
-                # print(response)
-            elif n_value == 14:
-                self.labels_rsi14[pairindex].configure(text=str(
-                    format(value, ".2f")), fg=colour)
-
-        if len(self.last_15_opens_1hr[pairindex]) > 3:
-            # Then do the 1hr RSI values
-            # Decided to do it this way as it was clearer that there are 2 updates
-            # Rather than playing coding golf
-            data = self.last_15_opens_1hr[pairindex]
-            # print(data)
-            # there are 15 or 16 values sent, the correct one is the last one
-            # value = DCWUtils.get_rsi(data, n=n_value)[-1]
-            return_value = DCWUtils.get_rsi(data, n=n_value)
-            if len(return_value):
-                value = return_value[-1]
+        # EAFP in case window is closed after thread added to queue
+        try:
+            if len(self.last_15_opens_5min[pairindex]) > 3:
+                # First do the 5min RSI values
+                data = self.last_15_opens_5min[pairindex]
+                # there are 15 or 16 values sent, the correct one is the last one
+                value = DCWUtils.get_rsi(data, n=n_value)[-1]
+                # if pairindex == 3:
+                # print(data)
                 colour = "black"
                 if value < 30:
                     colour = "green"
                 elif value > 70:
                     colour = "red"
                 if n_value == 6:
-                    self.labels_rsi6_1h[pairindex].configure(text=str(
+                    self.labels_rsi6[pairindex].configure(text=str(
                         format(value, ".2f")), fg=colour)
                 elif n_value == 14:
-                    self.labels_rsi14_1h[pairindex].configure(text=str(
+                    self.labels_rsi14[pairindex].configure(text=str(
                         format(value, ".2f")), fg=colour)
-            # else:
-            #     print("Empty array with "+str(self.currencies[pairindex]))
+
+            if len(self.last_15_opens_1hr[pairindex]) > 3:
+                # Then do the 1hr RSI values
+                # Decided to do it this way as it was clearer that there are 2 updates
+                # Rather than playing coding golf
+                data = self.last_15_opens_1hr[pairindex]
+                # print(data)
+                # there are 15 or 16 values sent, the correct one is the last one
+                # value = DCWUtils.get_rsi(data, n=n_value)[-1]
+                return_value = DCWUtils.get_rsi(data, n=n_value)
+                if len(return_value):
+                    value = return_value[-1]
+                    colour = "black"
+                    if value < 30:
+                        colour = "green"
+                    elif value > 70:
+                        colour = "red"
+                    if n_value == 6:
+                        self.labels_rsi6_1h[pairindex].configure(text=str(
+                            format(value, ".2f")), fg=colour)
+                    elif n_value == 14:
+                        self.labels_rsi14_1h[pairindex].configure(text=str(
+                            format(value, ".2f")), fg=colour)
+        except:
+            print("Window closed before thread could complete")
 
     def update_rsi(self):
         # Update the RSI values every second ticker update
@@ -486,26 +487,30 @@ class MarketWindow:
 
     def candle_thread_handler(self, mw, dcw, pair, sleep_timer):
         time.sleep(sleep_timer)
-        # Getting smaller chunks
-        # Most recent values are always last
-        data_5m_1h = dcw.get_candle(pair, "1m", 80)
-        data_1d_1w = dcw.get_candle(pair, "1h", 168)
-        data_hilo = dcw.get_candle(pair, "1d", 1)
-        mw.mw.update_percentages_new(
-            pair, data_5m_1h[-5], data_5m_1h[20], data_1d_1w[-24], data_1d_1w[0], data_hilo[0])
-        # then update the rsi 5min list
-        list_recent_5min = data_5m_1h[::5]
-        open_list = []
-        for line in list_recent_5min:
-            open_list.append(float(line["Open"]))
-        self.last_15_opens_5min[self.currencies.index(pair)] = open_list
-        # and then update the rsi 1hr list
-        list_recent_1hr = data_1d_1w[-15:]
-        open_list = []
-        for line in list_recent_1hr:
-            open_list.append(float(line["Open"]))
-        # print(open_list)
-        self.last_15_opens_1hr[self.currencies.index(pair)] = open_list
+        # EAFP in case window is closed after thread added to queue
+        try:
+            # Getting smaller chunks
+            # Most recent values are always last
+            data_5m_1h = dcw.get_candle(pair, "1m", 80)
+            data_1d_1w = dcw.get_candle(pair, "1h", 168)
+            data_hilo = dcw.get_candle(pair, "1d", 1)
+            mw.mw.update_percentages_new(
+                pair, data_5m_1h[-5], data_5m_1h[20], data_1d_1w[-24], data_1d_1w[0], data_hilo[0])
+            # then update the rsi 5min list
+            list_recent_5min = data_5m_1h[::5]
+            open_list = []
+            for line in list_recent_5min:
+                open_list.append(float(line["Open"]))
+            self.last_15_opens_5min[self.currencies.index(pair)] = open_list
+            # and then update the rsi 1hr list
+            list_recent_1hr = data_1d_1w[-15:]
+            open_list = []
+            for line in list_recent_1hr:
+                open_list.append(float(line["Open"]))
+            # print(open_list)
+            self.last_15_opens_1hr[self.currencies.index(pair)] = open_list
+        except:
+            print("Window closed before thread could complete")
 
     def update_candles(self, mw, root):
         # This is last thing called after opening market window
