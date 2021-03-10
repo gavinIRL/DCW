@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter.constants import CENTER
 import tkinter.font as tkFont
 import matplotlib
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
@@ -13,12 +14,36 @@ class ChartWindow:
     def __init__(self, mainwindow, root, **kwargs):
         self.mainwindow = mainwindow
         self.root = root
-        self.root.geometry("400x400+400+400")
+        font_heading = tkFont.Font(family='Times', size=10, weight="bold")
+        font_label = tkFont.Font(family='Times', size=10)
+        font_title = tkFont.Font(family='Times', size=20, weight="bold")
+
+        width = 400
+        height = 401
+        alignstr = '%dx%d+%d+%d' % (width, height, 10, 410)
+        self.root.geometry(alignstr)
+        self.root.resizable(width=False, height=False)
+        self.root.title("Analysis")
+
         self.starting_currency = kwargs.get("currency")
         self.starting_candle = kwargs.get("candle")
-        self.label = tk.Label(
-            root, text=f"This is the chart window for "+str(self.starting_currency))
-        self.label.pack()
+
+        # self.label = tk.Label(
+        #     root, text=f"This is the chart window for "+str(self.starting_currency))
+        # self.label.pack()
+        vert_position = 5
+        self.lbl_title = tk.Label(self.root)
+        self.lbl_title["font"] = font_title
+        self.lbl_title["justify"] = "center"
+        self.lbl_title["text"] = "Wallet"
+        self.lbl_title.place(x=0, y=vert_position, width=width, height=25)
+
+        vert_position += 30
+        self.lbl_net_worth = tk.Label(self.root)
+        self.lbl_net_worth["font"] = font_heading
+        self.lbl_net_worth["justify"] = "center"
+        self.lbl_net_worth["text"] = "Current Net Worth: $0.00"
+        self.lbl_net_worth.place(x=0, y=vert_position, width=width, height=20)
 
         self.fig = Figure(figsize=(7, 7), dpi=115)
         self.fig.add_subplot(1, 1, 1).plot(
@@ -28,8 +53,18 @@ class ChartWindow:
         self.canvas.draw()
 
         self.toolbar = NavigationToolbar2Tk(
-            self.canvas, self.root, pack_toolbar=False)
+            self.canvas, self.root, pack_toolbar=False,)
         self.toolbar.update()
 
-        self.toolbar.pack(side=tk.BOTTOM, fill=tk.X)
-        self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+        vert_position += 25
+        self.canvas.get_tk_widget().place(x=0, y=vert_position, width=width, height=300)
+        vert_position += 305
+        self.toolbar.place(relx=0.58, y=vert_position, width=300,
+                           height=30, anchor=CENTER)
+
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    root.attributes('-toolwindow', True)
+    cw = ChartWindow(None, root)
+    root.mainloop()
