@@ -4,4 +4,4 @@ __pycache__/
 # This is the settings file extension that will contain the api key and other user information
 *.cfg
 # Will add .csv to this once testing is complete
-*.csv
+#*.csv

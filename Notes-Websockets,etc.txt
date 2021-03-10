@@ -75,3 +75,15 @@ Missing 3m,2h,4h,8h
 Added 3h, 14D
 Changed 1w is now 7D
 All days are now big D
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+--------------------------------Wallet Format:--------------------------------
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+The rows will be of the following format:
+Currency, Amount, Bought Price, Bought Date
+Currency => example is BTC, not to include pair here
+Amount => example is 1 or 2.5, maximum 8 significant figures
+Bought Price => Price the currency was bought for
+Bought Date => Date the currency was bought
+
+The above information will be used to determine max worth, PnL trend, etc.
