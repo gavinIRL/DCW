@@ -12,7 +12,8 @@ class MarketWindow:
         self.root = root
         self.currencies = currencies
         # These are for holding the RSI recent values
-        self.last_15_opens = []
+        self.last_15_opens_5min = []
+        self.last_15_opens_1hr = []
         # These variables are for storing the latest data
         # Used for opening chart window from scratch and also pushing updates
         # self.candles = []
@@ -27,7 +28,8 @@ class MarketWindow:
             self.base_1hr.append(100)
             self.base_24hr.append(100)
             self.base_1wk.append(100)
-            self.last_15_opens.append([100, 200])
+            self.last_15_opens_5min.append([100, 200])
+            self.last_15_opens_1hr.append([100, 200])
             # might do something with entry after
         # This is used to reduce amount of updates of longer timeframes
         self.colour_update_counter = -3
@@ -68,7 +70,6 @@ class MarketWindow:
             x=545, y=vert_distance, width=55, height=20)
 
         # Then the labels of the columns of data
-
         horz_distance = 95
         vert_distance += 20
         self.lbl_heading = tk.Label(self.root)
@@ -287,9 +288,10 @@ class MarketWindow:
         self.update_all_prices(fresh_data)
 
     def rsi_thread_handler(self, pairindex, n_value):
-        if len(self.last_15_opens[pairindex]) > 3:
-            data = self.last_15_opens[pairindex]
-            # there are 15 values sent, the correct one is the last one
+        if len(self.last_15_opens_5min[pairindex]) > 3:
+            # First do the 5min RSI values
+            data = self.last_15_opens_5min[pairindex]
+            # there are 15 or 16 values sent, the correct one is the last one
             value = DCWUtils.get_rsi(data, n=n_value)[-1]
             # if pairindex == 3:
             # print(data)
@@ -305,7 +307,31 @@ class MarketWindow:
             elif n_value == 14:
                 self.labels_rsi14[pairindex].configure(text=str(
                     format(value, ".2f")), fg=colour)
-                pass
+
+        if len(self.last_15_opens_1hr[pairindex]) > 3:
+            # Then do the 1hr RSI values
+            # Decided to do it this way as it was clearer that there are 2 updates
+            # Rather than playing coding golf
+            data = self.last_15_opens_1hr[pairindex]
+            # print(data)
+            # there are 15 or 16 values sent, the correct one is the last one
+            # value = DCWUtils.get_rsi(data, n=n_value)[-1]
+            return_value = DCWUtils.get_rsi(data, n=n_value)
+            if len(return_value):
+                value = return_value[-1]
+                colour = "black"
+                if value < 30:
+                    colour = "green"
+                elif value > 70:
+                    colour = "red"
+                if n_value == 6:
+                    self.labels_rsi6_1h[pairindex].configure(text=str(
+                        format(value, ".2f")), fg=colour)
+                elif n_value == 14:
+                    self.labels_rsi14_1h[pairindex].configure(text=str(
+                        format(value, ".2f")), fg=colour)
+            # else:
+            #     print("Empty array with "+str(self.currencies[pairindex]))
 
     def update_rsi(self):
         # Update the RSI values every second ticker update
@@ -406,13 +432,20 @@ class MarketWindow:
             # And then update the recent RSI value
             # It will comprise of the previous 15 opens and current price
             # Check if there is a 16th value first
-            if len(self.last_15_opens[index]) < 3:
+            if len(self.last_15_opens_5min[index]) < 3:
                 pass
-            elif len(self.last_15_opens[index]) < 16:
-                self.last_15_opens[index].append(float(price))
+            elif len(self.last_15_opens_5min[index]) < 16:
+                self.last_15_opens_5min[index].append(float(price))
             # Otherwise update the 16th value
             else:
-                self.last_15_opens[index][-1] = float(price)
+                self.last_15_opens_5min[index][-1] = float(price)
+            if len(self.last_15_opens_1hr[index]) < 3:
+                pass
+            elif len(self.last_15_opens_1hr[index]) < 16:
+                self.last_15_opens_1hr[index].append(float(price))
+            # Otherwise update the 16th value
+            else:
+                self.last_15_opens_1hr[index][-1] = float(price)
         # And finally do a colour check
         self.update_colours()
         # And a RSI update also
@@ -456,16 +489,23 @@ class MarketWindow:
         # Getting smaller chunks
         # Most recent values are always last
         data_5m_1h = dcw.get_candle(pair, "1m", 80)
-        data_1d_1w = dcw.get_candle(pair, "2h", 84)
+        data_1d_1w = dcw.get_candle(pair, "1h", 168)
         data_hilo = dcw.get_candle(pair, "1d", 1)
         mw.mw.update_percentages_new(
-            pair, data_5m_1h[-5], data_5m_1h[20], data_1d_1w[-12], data_1d_1w[0], data_hilo[0])
-        # then update the rsi list
-        list_every_fifth_value = data_5m_1h[::5]
+            pair, data_5m_1h[-5], data_5m_1h[20], data_1d_1w[-24], data_1d_1w[0], data_hilo[0])
+        # then update the rsi 5min list
+        list_recent_5min = data_5m_1h[::5]
         open_list = []
-        for line in list_every_fifth_value:
-            open_list.append(float(line["Close"]))
-        self.last_15_opens[self.currencies.index(pair)] = open_list
+        for line in list_recent_5min:
+            open_list.append(float(line["Open"]))
+        self.last_15_opens_5min[self.currencies.index(pair)] = open_list
+        # and then update the rsi 1hr list
+        list_recent_1hr = data_1d_1w[-15:]
+        open_list = []
+        for line in list_recent_1hr:
+            open_list.append(float(line["Open"]))
+        # print(open_list)
+        self.last_15_opens_1hr[self.currencies.index(pair)] = open_list
 
     def update_candles(self, mw, root):
         # This is last thing called after opening market window
