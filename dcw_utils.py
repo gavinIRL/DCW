@@ -74,7 +74,7 @@ class DCWUtils():
     @staticmethod
     def convert_ms_to_datetime(ms: int):
         base_datetime = datetime.datetime(1970, 1, 1)
-        delta = datetime.timedelta(0, 0, 0, ms)
+        delta = datetime.timedelta(0, 0, 0, ms*1000)
         target_date = base_datetime + delta
         return target_date
 
@@ -196,11 +196,11 @@ class DCWUtils():
             new_data = existing_data[0]
         # Then check whether to use the start time value
         clean_format_time = str(self.convert_ms_to_datetime(
-            start_time)).replace(" ", "-").split(".")[0]
+            start_time)).replace("-", "")
+        clean_format_time = clean_format_time.replace(" ", "-").split(".")[0]
         clean_format_time = clean_format_time.replace(":", "")
         if self.log_start_time == 0:
             self.log_start_time = clean_format_time
-            print("Choosing time "+clean_format_time)
         # Then update the buffer data
         self.buffer_times.append(clean_format_time)
         self.buffer_data.append(new_data.copy())
@@ -208,11 +208,19 @@ class DCWUtils():
         if self.buffer_counter >= buffer:
             self.buffer_counter = 0
             for i, pair in enumerate(pairs):
-                filename = str(pair)+"-"+str(self.log_start_time)+".csv"
+
+                filename = str(pair)+"-" + \
+                    str(self.log_start_time)+".csv"
                 if path:
-                    filename = str(path)+str(filename)
+                    folder_path = str(path) + str(pair) + "/"
+                    if not os.path.exists(folder_path):
+                        os.mkdir(folder_path)
+                    filename = folder_path + str(filename)
                 else:
-                    filename = "D:/DCWLog/" + filename
+                    folder_path = "D:/DCWLog/" + str(pair) + "/"
+                    if not os.path.exists(folder_path):
+                        os.mkdir(folder_path)
+                    filename = folder_path + filename
                 # Check if file already exists
                 if not os.path.isfile(filename):
                     with open(filename, "w") as file:
