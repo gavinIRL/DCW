@@ -28,6 +28,10 @@ class DCWUtils():
             self.update_rate = 1000
         else:
             print("Only Bitfinex and Binance supported so far")
+        # These are for csv logging
+        self.buffer_counter = 0
+        self.log_start_time = 0
+        self.buffer_data = []
 
     def request_api(self, suffix):
         url = self.url_base + suffix
@@ -176,6 +180,40 @@ class DCWUtils():
             return self.create_suffix_bitfinex()
         else:
             return False
+
+    def csv_logger(self, pairs: list, time_list=False, existing_data=False, buffer=10, path=False):
+        start_time = None
+        new_data = []
+        if not existing_data:
+            # Grab the data first as it isn't provided
+            start_time = time.time()
+            new_data = []
+            pass
+        else:
+            start_time = time_list[0]
+            new_data = existing_data
+        # Then check whether to use the start time value
+        if self.log_start_time == 0:
+            self.log_start_time = start_time
+        # Check if the lists are the same length
+        if not len(time_list) == len(existing_data[0]):
+            print("Lists are not same length, aborting")
+            return False
+        # Then update the buffer data
+        self.buffer_data.append(new_data)
+        # Then write to the files every time 10 ticks are saved up
+        if self.buffer_counter >= buffer:
+            self.buffer_counter = 0
+            for i, pair in enumerate(pairs):
+                file_time = self.convert_ms_to_datetime(self.log_start_time)
+                filename = str(pair)+"-"+str(file_time)+".csv"
+                if path:
+                    filename = path+filename
+                with open(filename, "w") as file:
+                    for j, line in enumerate(time_list):
+                        file.write(str(line)+","+str(new_data[i][j]))
+        else:
+            self.buffer_counter += 1
 
     def get_net_worth(self, currency_list):
         pass
