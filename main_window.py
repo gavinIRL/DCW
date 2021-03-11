@@ -37,6 +37,7 @@ class MainWindow():
             "BTCUSDT", "ETHUSDT", "ADAUSDT", "BNBUSDT", "DOTUSDT", "XRPUSDT", "LTCUSDT", "XLMUSDT",
             "BCHUSDT", "DOGEUSDT", "XEMUSDT", "ATOMUSDT", "XMRUSDT", "EOSUSDT", "TRXUSDT"]
         # This is for csv logging
+        self.enable_logging = False
         self.log_loop_tracker = -5
         self.fresh_prices = []
         for curr in self.market_currency_list:
@@ -228,21 +229,23 @@ if __name__ == "__main__":
             # Then update the prices in the market window
             current_time = time.time()
             fresh_data = dcw.get_tick(MainWindow.market_currency_list)
-            # Prepare data for logging in csv
 
-            for pair, price in fresh_data.items():
-                index = MainWindow.market_currency_list.index(pair)
-                MainWindow.fresh_prices[index] = price
             # Update the relevant windows
             MainWindow.mw.update_all_prices(fresh_data)
             MainWindow.update_bitcoin_price(fresh_data["BTCUSDT"])
-            # And then send the data for logging after the first few loops
-            # Will eventually make it so that it starts appending to a new file every hour
-            if MainWindow.log_loop_tracker > 0:
-                dcw.csv_logger(pairs=MainWindow.market_currency_list, time_list=[
-                    current_time], existing_data=[MainWindow.fresh_prices])
-            # print(MainWindow.fresh_prices)
-            MainWindow.log_loop_tracker += 1
+
+            if MainWindow.enable_logging:
+                # Prepare data for logging in csv
+                for pair, price in fresh_data.items():
+                    index = MainWindow.market_currency_list.index(pair)
+                    MainWindow.fresh_prices[index] = price
+                # And then send the data for logging after the first few loops
+                # Will eventually make it so that it starts appending to a new file every hour
+                if MainWindow.log_loop_tracker > 0:
+                    dcw.csv_logger(pairs=MainWindow.market_currency_list, time_list=[
+                        current_time], existing_data=[MainWindow.fresh_prices])
+                # Will do something like grab a create a new file every day later
+                MainWindow.log_loop_tracker += 1
 
         # Otherwise grab the data and update mainwindow only
         else:
