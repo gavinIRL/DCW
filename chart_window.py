@@ -64,12 +64,12 @@ class ChartWindow:
         self.combo_currency.place(x=250, y=vert_position, width=149, height=25)
 
         vert_position += 30
-        self.lbl_net_worth = tk.Label(self.root)
-        self.lbl_net_worth["font"] = font_heading
-        self.lbl_net_worth["justify"] = "center"
-        self.lbl_net_worth[
+        self.lbl_indicators = tk.Label(self.root)
+        self.lbl_indicators["font"] = font_heading
+        self.lbl_indicators["justify"] = "center"
+        self.lbl_indicators[
             "text"] = "RSI(6)=12.2  |  RSI(14)=15.3  |  MA(50)=52100.12  |  HV(10) = 40"
-        self.lbl_net_worth.place(x=0, y=vert_position, width=width, height=20)
+        self.lbl_indicators.place(x=0, y=vert_position, width=width, height=20)
 
         # self.fig = Figure(figsize=(7, 7), dpi=115)
         # self.ax = self.fig.add_subplot(1, 1, 1)
@@ -88,29 +88,29 @@ class ChartWindow:
         # self.toolbar.place(relx=0.58, y=vert_position, width=300,
         #                    height=30, anchor=CENTER)
 
-        self.xdata, self.ydata = [], []
-        self.figure = pyplot.figure()
-        self.line, = pyplot.plot_date(self.xdata, self.ydata, "-")
-        # self.figure.place(relx=0.58, y=vert_position,
-        #                   width=300, height=30, anchor=CENTER)
+    #     self.xdata, self.ydata = [], []
+    #     self.figure = pyplot.figure()
+    #     self.line, = pyplot.plot_date(self.xdata, self.ydata, "-")
+    #     # self.figure.place(relx=0.58, y=vert_position,
+    #     #                   width=300, height=30, anchor=CENTER)
 
-        self.canvas = FigureCanvasTkAgg(self.figure, master=self.root)
-        self.canvas.draw()
+    #     self.canvas = FigureCanvasTkAgg(self.figure, master=self.root)
+    #     self.canvas.draw()
 
-    def update_figure(self, frame):
-        self.xdata.append(datetime.now())
-        self.ydata.append(random.randint(80, 120))
-        self.line.set_data(self.xdata, self.ydata)
-        self.figure.gca().relim()
-        self.figure.gca().autoscale_view()
-        pyplot.show()
-        return self.line,
+    # def update_figure(self, frame):
+    #     self.xdata.append(datetime.now())
+    #     self.ydata.append(random.randint(80, 120))
+    #     self.line.set_data(self.xdata, self.ydata)
+    #     self.figure.gca().relim()
+    #     self.figure.gca().autoscale_view()
+    #     pyplot.show()
+    #     return self.line,
 
 
 if __name__ == "__main__":
     root = tk.Tk()
     root.attributes('-toolwindow', True)
     cw = ChartWindow(None, root)
-    animation = FuncAnimation(cw.figure, cw.update_figure, interval=200)
+    # animation = FuncAnimation(cw.figure, cw.update_figure, interval=200)
 
     root.mainloop()
