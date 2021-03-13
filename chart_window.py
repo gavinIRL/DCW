@@ -103,7 +103,7 @@ class ChartWindow(Frame):
         self.toolbar = NavigationToolbar2Tk(
             self.canvas, self.root, pack_toolbar=False,)
         self.toolbar.update()
-        self.toolbar.place(relx=0.52, y=vert_position, width=300,
+        self.toolbar.place(relx=0.58, y=vert_position, width=300,
                            height=30, anchor=tk.constants.CENTER)
 
 

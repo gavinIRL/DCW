@@ -9,6 +9,7 @@ import time
 from requests.exceptions import HTTPError
 import threading
 import queue
+import talib as ta
 
 # This is the class that contains the workhorse functions
 # I admit it is a really confused class, over 50% static methods
@@ -250,6 +251,9 @@ class DCWUtils():
     def set_wallet(currency_list):
         pass
 
+    def calculate_ma(sequence, n):
+        return ta.MA(np.array(sequence), n)
+
     @ nb.jit(fastmath=True, nopython=True)
     def calculate_rsi(array, deltas, avg_gain, avg_loss, n):
 
@@ -300,6 +304,8 @@ if __name__ == "__main__":
     # output = dcw.get_candle("BTCUSDT", "1m", 10)
     input = [2, 1.5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
              1, 2, 3, 4, 5, 6, 4, 5, 6, 5, 6, 5, 6, 5, 4, 3, 2, 1, 0.5, 4, 9]
-    print(input)
-    output = DCWUtils.get_rsi(input, n=6)
-    print(output)
+    # print(input)
+    #output = DCWUtils.get_rsi(input, n=6)
+    # print(output)
+    #print(DCWUtils.calculate_ma(input, 5))
+    print(ta.get_functions())
