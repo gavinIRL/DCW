@@ -24,7 +24,7 @@ class MainWindow():
         self.threads = []
 
         # set variables for handling windows
-        self.new_window_analysis = None
+        self.new_window_chart = None
         self.new_window_wallet = None
         self.new_window_settings = None
         self.new_window_alerts = None
@@ -157,10 +157,10 @@ class MainWindow():
             _class(self, self.new_window_wallet)
         if _class is ChartWindow:
             # self.btn_chart["state"] = "disabled"
-            self.new_window_analysis = tk.Toplevel(self.root)
-            # self.new_window_analysis.protocol(
+            self.new_window_chart = tk.Toplevel(self.root)
+            # self.new_window_chart.protocol(
             #     "WM_DELETE_WINDOW", self.destroy_analysis)
-            _class(self, self.new_window_analysis, **kwargs)
+            _class(master=self.new_window_chart, **kwargs)
         if _class is SettingsWindow:
             self.btn_settings["state"] = "disabled"
             self.new_window_settings = tk.Toplevel(self.root)

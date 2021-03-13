@@ -278,7 +278,7 @@ class MarketWindow:
     def btn_chart_command(self, index):
         # print(index)
         self.mainwindow.new_window(
-            _class=ChartWindow, currency=self.currencies[index])
+            _class=ChartWindow, mainwindow=self.mainwindow, currency=self.currencies[index], prices=self.last_15_opens_5min[index])
         # Open chart window for the given currency
         pass
 

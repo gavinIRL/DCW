@@ -39,7 +39,7 @@ class ChartWindow(Frame):
         if "times" in kwargs:
             self.list_times = kwargs.get("times")
         else:
-            for i in range(10):
+            for i in range(len(self.list_prices)):
                 self.list_times.append(i)
         self.init()
 
@@ -60,11 +60,11 @@ class ChartWindow(Frame):
         vert_position = 5
 
         self.combo_time = ttk.Combobox(
-            root, textvariable=self.currency_shown)
+            self.root, textvariable=self.currency_shown)
         self.combo_time.place(x=1, y=vert_position, width=74, height=25)
 
         self.combo_indicator = ttk.Combobox(
-            root, textvariable=self.currency_shown)
+            self.root, textvariable=self.currency_shown)
         self.combo_indicator.place(x=75, y=vert_position, width=74, height=25)
 
         self.lbl_title = tk.Label(self.root)
@@ -74,7 +74,7 @@ class ChartWindow(Frame):
         self.lbl_title.place(x=150, y=vert_position, width=100, height=25)
 
         self.combo_currency = ttk.Combobox(
-            root, textvariable=self.currency_shown)
+            self.root, textvariable=self.currency_shown)
         self.combo_currency.place(x=250, y=vert_position, width=149, height=25)
 
         vert_position += 30
@@ -93,7 +93,7 @@ class ChartWindow(Frame):
         self.line, = self.ax.plot(self.list_times, self.list_prices)
 
         self.canvas = FigureCanvasTkAgg(self.fig, master=self)
-        self.canvas.get_tk_widget().place(x=0, y=vert_position,
+        self.canvas.get_tk_widget().place(x=10, y=vert_position,
                                           width=self.width, height=300)
 
         self.ani = animation.FuncAnimation(
