@@ -68,10 +68,6 @@ class DCWUtils():
                 print(err.code)
                 return False
 
-    def calculate_RSI(closelist, alpha=14):
-        # Calculate the SMMA and then RSI given a sequence of closes
-        pass
-
     @staticmethod
     def convert_ms_to_datetime(ms: int):
         base_datetime = datetime.datetime(1970, 1, 1)
@@ -254,6 +250,9 @@ class DCWUtils():
     def calculate_ma(sequence, n):
         return ta.MA(np.array(sequence), n)
 
+    def calculate_rsi_talib(sequence, n):
+        return ta.RSI(np.array(sequence), n)
+
     @ nb.jit(fastmath=True, nopython=True)
     def calculate_rsi(array, deltas, avg_gain, avg_loss, n):
 
@@ -307,5 +306,5 @@ if __name__ == "__main__":
     # print(input)
     #output = DCWUtils.get_rsi(input, n=6)
     # print(output)
-    #print(DCWUtils.calculate_ma(input, 5))
-    print(ta.get_functions())
+    print(DCWUtils.calculate_rsi_talib(input, 5))
+    # print(ta.get_functions())
