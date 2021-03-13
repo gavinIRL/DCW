@@ -1,48 +1,62 @@
-import tkinter as tk
-from tkinter.constants import CENTER
-import tkinter.font as tkFont
-from tkinter import ttk
-import matplotlib
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
-from matplotlib.backend_bases import key_press_handler
-from matplotlib.figure import Figure
-import random
-from matplotlib import pyplot
-from datetime import datetime
-from matplotlib.animation import FuncAnimation
+import tkinter as tk
+from tkinter import ttk
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+from tkinter import Frame
+from random import randrange
+import tkinter.font as tkFont
 
-# Small bit of setup, need to use TkAgg instead of default
-matplotlib.use("TkAgg")
 
+class ChartWindow(Frame):
 
-class ChartWindow:
-    def __init__(self, mainwindow, root, **kwargs):
+    def __init__(self, master=None, mainwindow=None, **kwargs):
+        Frame.__init__(self, master)
+        self.root = master
         self.mainwindow = mainwindow
-        self.root = root
-        self.currency_list = kwargs.get("currency_list")
-        self.currency_shown = tk.StringVar()
-        font_heading = tkFont.Font(family='Times', size=10, weight="bold")
-        font_label = tkFont.Font(family='Times', size=10)
-        font_title = tkFont.Font(family='Times', size=12, weight="bold")
-        self.current_data = [100, 104, 121, 108, 132]
-        self.current_data_time = [1, 2, 3, 4, 5]
-
-        width = 400
-        height = 401
-        alignstr = '%dx%d+%d+%d' % (width, height, 10, 410)
-        self.root.geometry(alignstr)
+        self.width = 400
+        self.height = 401
+        alignstr = '%dx%d+%d+%d' % (self.width, self.height, 10, 410)
         self.root.resizable(width=False, height=False)
-        self.root.title("Analysis")
+        self.root.geometry(alignstr)
 
+        # Variables to hold data
+        self.list_times = []
+        self.list_prices = []
+        # This is for testing
+        self.test_mode = True
         if "currency" in kwargs:
             self.currency_shown = kwargs.get("currency")
         else:
             self.currency_shown = "BTCUSDT"
-        self.starting_candle = kwargs.get("candle")
+        if "prices" in kwargs:
+            self.list_prices = kwargs.get("prices")
+            self.test_mode = False
+        else:
+            for i in range(10):
+                self.list_prices.append(randrange(80, 100))
+        if "times" in kwargs:
+            self.list_times = kwargs.get("times")
+        else:
+            for i in range(10):
+                self.list_times.append(i)
+        self.init()
 
-        # self.label = tk.Label(
-        #     root, text=f"This is the chart window for "+str(self.starting_currency))
-        # self.label.pack()
+    def update(self, i):
+        if self.test_mode:
+            self.list_prices[-1] = randrange(90, 100)
+        self.line.set_ydata(self.list_prices)
+        return self.line,
+
+    def init(self):
+        font_heading = tkFont.Font(family='Times', size=10, weight="bold")
+        font_label = tkFont.Font(family='Times', size=10)
+        font_title = tkFont.Font(family='Times', size=12, weight="bold")
+
+        self.root.title("Analysis")
+        self.pack(fill='both', expand=1)
+
         vert_position = 5
 
         self.combo_time = ttk.Combobox(
@@ -69,48 +83,32 @@ class ChartWindow:
         self.lbl_indicators["justify"] = "center"
         self.lbl_indicators[
             "text"] = "RSI(6)=12.2  |  RSI(14)=15.3  |  MA(50)=52100.12  |  HV(10) = 40"
-        self.lbl_indicators.place(x=0, y=vert_position, width=width, height=20)
+        self.lbl_indicators.place(
+            x=0, y=vert_position, width=self.width, height=20)
 
-        # self.fig = Figure(figsize=(7, 7), dpi=115)
-        # self.ax = self.fig.add_subplot(1, 1, 1)
-        # self.ax.plot([1, 2, 3, 4, 5], [100, 104, 121, 108, 132])
+        vert_position += 25
 
-        # self.canvas = FigureCanvasTkAgg(self.fig, master=self.root)
-        # self.canvas.draw()
+        self.fig = plt.Figure()
+        self.ax = self.fig.add_subplot(111)
+        self.line, = self.ax.plot(self.list_times, self.list_prices)
 
-        # self.toolbar = NavigationToolbar2Tk(
-        #     self.canvas, self.root, pack_toolbar=False,)
-        # self.toolbar.update()
+        self.canvas = FigureCanvasTkAgg(self.fig, master=self)
+        self.canvas.get_tk_widget().place(x=0, y=vert_position,
+                                          width=self.width, height=300)
 
-        # vert_position += 25
-        # self.canvas.get_tk_widget().place(x=0, y=vert_position, width=width, height=300)
-        # vert_position += 305
-        # self.toolbar.place(relx=0.58, y=vert_position, width=300,
-        #                    height=30, anchor=CENTER)
+        self.ani = animation.FuncAnimation(
+            self.fig, self.update, np.arange(1, 10), interval=250, blit=False)
 
-    #     self.xdata, self.ydata = [], []
-    #     self.figure = pyplot.figure()
-    #     self.line, = pyplot.plot_date(self.xdata, self.ydata, "-")
-    #     # self.figure.place(relx=0.58, y=vert_position,
-    #     #                   width=300, height=30, anchor=CENTER)
-
-    #     self.canvas = FigureCanvasTkAgg(self.figure, master=self.root)
-    #     self.canvas.draw()
-
-    # def update_figure(self, frame):
-    #     self.xdata.append(datetime.now())
-    #     self.ydata.append(random.randint(80, 120))
-    #     self.line.set_data(self.xdata, self.ydata)
-    #     self.figure.gca().relim()
-    #     self.figure.gca().autoscale_view()
-    #     pyplot.show()
-    #     return self.line,
+        vert_position += 305
+        self.toolbar = NavigationToolbar2Tk(
+            self.canvas, self.root, pack_toolbar=False,)
+        self.toolbar.update()
+        self.toolbar.place(relx=0.52, y=vert_position, width=300,
+                           height=30, anchor=tk.constants.CENTER)
 
 
 if __name__ == "__main__":
     root = tk.Tk()
     root.attributes('-toolwindow', True)
-    cw = ChartWindow(None, root)
-    # animation = FuncAnimation(cw.figure, cw.update_figure, interval=200)
-
-    root.mainloop()
+    cw = ChartWindow(root)
+    tk.mainloop()
