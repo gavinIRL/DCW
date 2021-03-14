@@ -247,8 +247,23 @@ class DCWUtils():
     def set_wallet(currency_list):
         pass
 
-    def calculate_ma(sequence, n):
-        return ta.MA(np.array(sequence), n)
+    def calculate_ma(sequence, time_period):
+        return ta.MA(np.array(sequence), time_period)
+
+    def calculate_ema(sequence, time_period):
+        return ta.EMA(np.array(sequence), time_period)
+
+    def calculate_mom(sequence, time_period):
+        return ta.MOM(np.array(sequence), time_period)
+
+    def calculate_trix(sequence, time_period):
+        return ta.TRIX(np.array(sequence), time_period)
+
+    def calculate_dema(sequence, time_period):
+        return ta.DEMA(np.array(sequence), time_period)
+
+    def calculate_tema(sequence, time_period):
+        return ta.TEMA(np.array(sequence), time_period)
 
     def calculate_rsi_talib(sequence, n):
         return ta.RSI(np.array(sequence), n)
@@ -307,4 +322,5 @@ if __name__ == "__main__":
     #output = DCWUtils.get_rsi(input, n=6)
     # print(output)
     #print(DCWUtils.calculate_rsi_talib(input, 5))
-    print(ta.get_functions())
+    # print(ta.get_functions())
+    print(DCWUtils.calculate_dema(input, 5))
