@@ -306,5 +306,5 @@ if __name__ == "__main__":
     # print(input)
     #output = DCWUtils.get_rsi(input, n=6)
     # print(output)
-    print(DCWUtils.calculate_rsi_talib(input, 5))
-    # print(ta.get_functions())
+    #print(DCWUtils.calculate_rsi_talib(input, 5))
+    print(ta.get_functions())
