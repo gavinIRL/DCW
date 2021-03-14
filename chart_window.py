@@ -24,13 +24,13 @@ class ChartWindow(Frame):
         # Variables to hold data
         self.list_times = []
         self.list_prices = []
-        self.currency_shown = tk.StringVar()
+
         # This is for testing
         self.test_mode = True
         if "currency" in kwargs:
-            self.currency_shown = kwargs.get("currency")
+            self.start_currency = kwargs.get("currency")
         else:
-            self.currency_shown = "BTCUSDT"
+            self.start_currency = "BTCUSDT"
         if "prices" in kwargs:
             self.list_prices = kwargs.get("prices")
             self.test_mode = False
@@ -54,6 +54,16 @@ class ChartWindow(Frame):
         self.line.set_ydata(self.list_prices)
         return self.line,
 
+    def change_box_time(self, eventObject):
+        print(self.time_shown.get())
+
+    def change_box_indicator(self, eventObject):
+        print(self.indicator_shown.get())
+
+    def change_box_currency(self, eventObject):
+        self.lbl_title["text"] = self.currency_shown.get()
+        print(self.currency_shown.get())
+
     def init(self):
         font_heading = tkFont.Font(family='Times', size=10, weight="bold")
         font_label = tkFont.Font(family='Times', size=10)
@@ -71,6 +81,7 @@ class ChartWindow(Frame):
         self.combo_time["values"] = (
             "1min", "5min", "10min", "15min", "30min", "1hr", "3hr", "6hr", "12hr", "1day")
         self.combo_time.current(1)
+        self.combo_time.bind("<<ComboboxSelected>>", self.change_box_time)
 
         self.indicator_shown = tk.StringVar()
         self.combo_indicator = ttk.Combobox(
@@ -79,18 +90,23 @@ class ChartWindow(Frame):
         self.combo_indicator["values"] = (
             "RSI(6)", "RSI(14)", "MA(50)", "HV(10)")
         self.combo_indicator.current(0)
+        self.combo_indicator.bind(
+            "<<ComboboxSelected>>", self.change_box_indicator)
 
         self.lbl_title = tk.Label(self.root)
         self.lbl_title["font"] = font_title
         self.lbl_title["justify"] = "center"
-        self.lbl_title["text"] = self.currency_shown
+        self.lbl_title["text"] = self.start_currency
         self.lbl_title.place(x=150, y=vert_position, width=100, height=25)
 
+        self.currency_shown = tk.StringVar()
         self.combo_currency = ttk.Combobox(
             self.root, textvariable=self.currency_shown, values=self.currency_list, state="readonly")
         self.combo_currency.place(x=250, y=vert_position, width=149, height=25)
         self.combo_currency.current(
-            self.currency_list.index(self.currency_shown))
+            self.currency_list.index(self.start_currency))
+        self.combo_currency.bind(
+            "<<ComboboxSelected>>", self.change_box_currency)
 
         vert_position += 30
         self.lbl_indicators = tk.Label(self.root)
