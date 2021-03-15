@@ -13,6 +13,8 @@ import os
 from requests.exceptions import HTTPError
 import json
 import requests
+import talib as ta
+import numpy as np
 
 
 class StandaloneLogger():
@@ -81,6 +83,27 @@ class StandaloneLogger():
         delta = datetime.timedelta(0, 0, 0, ms*1000)
         target_date = base_datetime + delta
         return target_date
+
+    def calculate_ma_logger(sequence, time_period):
+        return ta.MA(np.array(sequence), time_period)
+
+    def calculate_ema_logger(sequence, time_period):
+        return ta.EMA(np.array(sequence), time_period)
+
+    def calculate_mom_logger(sequence, time_period):
+        return ta.MOM(np.array(sequence), time_period)
+
+    def calculate_trix_logger(sequence, time_period):
+        return ta.TRIX(np.array(sequence), time_period)
+
+    def calculate_dema_logger(sequence, time_period):
+        return ta.DEMA(np.array(sequence), time_period)
+
+    def calculate_tema_logger(sequence, time_period):
+        return ta.TEMA(np.array(sequence), time_period)
+
+    def calculate_rsi_logger(sequence, time_period):
+        return ta.RSI(np.array(sequence), time_period)
 
     def csv_writer_thread_handler(self, curr_index, filepath):
         # This will calculate the rsi and ma values for a given currency
