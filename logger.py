@@ -105,10 +105,26 @@ class StandaloneLogger():
     def calculate_rsi_logger(sequence, time_period):
         return ta.RSI(np.array(sequence), time_period)
 
-    def csv_writer_thread_handler(self, curr_index, filepath):
+    def csv_writer_thread_handler(self, curr_index, filepath, indicators=True):
         # This will calculate the rsi and ma values for a given currency
         # The calculations will be based on the prices saved in StandaloneLogger class
         # And then finally it will append/write to the relevant file
+        line = ""
+        if indicators:
+            # Need to grab the appropriate data
+            # For example need to have the klines for last 50 5min segments
+            # And also the last 50 1hr segments
+            data_5min = []
+            data_1hr = []
+            ma_50_5min = self.calculate_ma_logger(data_5min, 50)[-1]
+            ma_50_1hr = self.calculate_ma_logger(data_1hr, 50)[-1]
+            rsi_6_5min = self.calculate_rsi_logger(data_5min, 6)[-1]
+            rsi_6_1hr = self.calculate_rsi_logger(data_1hr, 6)[-1]
+            rsi_14_5min = self.calculate_rsi_logger(data_5min, 14)[-1]
+            rsi_14_1hr = self.calculate_rsi_logger(data_1hr, 14)[-1]
+            line = line + ","+ma_50_5min+","+ma_50_1hr+"," + \
+                rsi_6_5min+","+rsi_6_1hr+","+rsi_14_5min+","+rsi_14_1hr
+        # And then write the data to the file
         pass
 
     def csv_logger_lightweight(self, pairs: list, time_list=False, price_data=False, buffer=20, path=False):
