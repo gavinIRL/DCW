@@ -82,7 +82,13 @@ class StandaloneLogger():
         target_date = base_datetime + delta
         return target_date
 
-    def csv_logger_lightweight(self, pairs: list, time_list=False, price_data=False, buffer=15, path=False):
+    def csv_writer_thread_handler(self, curr_index, filepath):
+        # This will calculate the rsi and ma values for a given currency
+        # The calculations will be based on the prices saved in StandaloneLogger class
+        # And then finally it will append/write to the relevant file
+        pass
+
+    def csv_logger_lightweight(self, pairs: list, time_list=False, price_data=False, buffer=20, path=False):
         # This can accept multiple lines of data at once
         start_time = time_list[0]
         # Will use a single list instead of multiple lists for price_data in lightweight version
