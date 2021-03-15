@@ -1,5 +1,11 @@
 # This is meant as a standalone logging script for creating bot training datasets
-
+# To-do list:
+# 1) Bring in relevant functions and make custom lightweight versions so it is truly standalone
+# 2) Need to increase the buffer size to 15
+# 3) Need to store values for calculating rsi(14) for 1hr and everything below that
+# 4) The final csv file format should be as follows:
+# time ms, price, ma(50)5m, ma(50)1h, rsi(6)5m, rsi(6)1h, rsi(14)5m, rsi(14)1h
+# 5) Potentially update the format to include more information later
 from dcw_utils import DCWUtils
 import time
 
