@@ -1,7 +1,5 @@
 # This is meant as a standalone logging script for creating bot training datasets
 # To-do list:
-# 1) Bring in relevant functions and make custom lightweight versions so it is truly standalone
-# 2) Need to increase the buffer size to 15
 # 3) Need to store values for calculating rsi(14) for 1hr and everything below that
 # 4) The final csv file format should be as follows:
 # time ms, price, ma(50)5m, ma(50)1h, rsi(6)5m, rsi(6)1h, rsi(14)5m, rsi(14)1h
@@ -27,6 +25,8 @@ class StandaloneLogger():
         self.fresh_prices = []
         for curr in self.market_currency_list:
             self.fresh_prices.append(1.2)
+        self.last_50_closes_5min = []
+        self.last_50_closes_1hr = []
 
     def get_tick_logger(self, pair=False):
         if isinstance(pair, str):
@@ -125,7 +125,9 @@ class StandaloneLogger():
             line = line + ","+ma_50_5min+","+ma_50_1hr+"," + \
                 rsi_6_5min+","+rsi_6_1hr+","+rsi_14_5min+","+rsi_14_1hr
         # And then write the data to the file
-        pass
+        # First check if the folder exists
+
+        # Then check if the file already exists and then either append or write as required
 
     def csv_logger_lightweight(self, pairs: list, time_list=False, price_data=False, buffer=20, path=False):
         # This can accept multiple lines of data at once
