@@ -140,16 +140,15 @@ class StandaloneLogger():
 
 if __name__ == "main":
     sl = StandaloneLogger()
-    dcw = DCWUtils("Binance")
 
     def update_prices():
         while sl.log_loop_tracker < 1000:
             current_time = time.time()
-            fresh_data = dcw.get_tick(sl.market_currency_list)
+            fresh_data = sl.get_tick_logger(sl.market_currency_list)
             for pair, price in fresh_data.items():
                 index = sl.market_currency_list.index(pair)
                 sl.fresh_prices[index] = price
-            dcw.csv_logger(pairs=sl.market_currency_list, time_list=[
+            sl.csv_logger_lightweight(pairs=sl.market_currency_list, time_list=[
                 current_time], price_data=[sl.fresh_prices], path="C:/DCWLog/Test/")
             sl.log_loop_tracker += 1
             time.sleep(1.5)
