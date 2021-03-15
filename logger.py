@@ -8,6 +8,8 @@
 # 5) Potentially update the format to include more information later
 from dcw_utils import DCWUtils
 import time
+import datetime
+import os
 from requests.exceptions import HTTPError
 import json
 import requests
@@ -19,6 +21,7 @@ class StandaloneLogger():
             "BTCUSDT", "ETHUSDT", "ADAUSDT", "BNBUSDT", "DOTUSDT", "XRPUSDT", "LTCUSDT", "XLMUSDT",
             "BCHUSDT", "DOGEUSDT", "XEMUSDT", "ATOMUSDT", "XMRUSDT", "EOSUSDT", "TRXUSDT"]
         self.log_loop_tracker = 0
+        self.buffer_counter = 1
         self.fresh_prices = []
         for curr in self.market_currency_list:
             self.fresh_prices.append(1.2)
@@ -72,6 +75,62 @@ class StandaloneLogger():
                 print(err.code)
                 return False
 
+    @staticmethod
+    def convert_ms_to_datetime_logger(ms: int):
+        base_datetime = datetime.datetime(1970, 1, 1)
+        delta = datetime.timedelta(0, 0, 0, ms*1000)
+        target_date = base_datetime + delta
+        return target_date
+
+    def csv_logger_lightweight(self, pairs: list, time_list=False, price_data=False, buffer=15, path=False):
+        # This can accept multiple lines of data at once
+        start_time = time_list[0]
+        # Will use a single list instead of multiple lists for price_data in lightweight version
+        # Then check whether to use the start time value
+        clean_format_time = str(self.convert_ms_to_datetime_logger(
+            start_time)).replace("-", "")
+        clean_format_time = clean_format_time.replace(" ", "-").split(".")[0]
+        clean_format_time = clean_format_time.replace(":", "")
+        if self.log_start_time == 0:
+            self.log_start_time = clean_format_time
+        # Then update the buffer data
+        self.buffer_times.append(clean_format_time)
+        self.buffer_data.append(price_data.copy())
+        # Then write to the files every time 10 ticks are saved up
+        if self.buffer_counter >= buffer:
+            self.buffer_counter = 0
+            for i, pair in enumerate(pairs):
+
+                filename = str(pair)+"-" + \
+                    str(self.log_start_time)+".csv"
+                if path:
+                    folder_path = str(path) + str(pair) + "/"
+                    if not os.path.exists(folder_path):
+                        os.mkdir(folder_path)
+                    filename = folder_path + str(filename)
+                else:
+                    folder_path = "D:/DCWLog/" + str(pair) + "/"
+                    if not os.path.exists(folder_path):
+                        os.mkdir(folder_path)
+                    filename = folder_path + filename
+                # Check if file already exists
+                if not os.path.isfile(filename):
+                    with open(filename, "w") as file:
+                        for j, line in enumerate(self.buffer_times):
+                            csv_data = self.buffer_data[j][i]
+                            file.write(str(line)+","+str(csv_data)+"\n")
+                # Otherwise append
+                else:
+                    with open(filename, "a") as file:
+                        for j, line in enumerate(self.buffer_times):
+                            csv_data = self.buffer_data[j][i]
+                            file.write(str(line)+","+str(csv_data)+"\n")
+            # Then reset the buffer
+            self.buffer_times = []
+            self.buffer_data = []
+        else:
+            self.buffer_counter += 1
+
 
 if __name__ == "main":
     sl = StandaloneLogger()
@@ -85,6 +144,6 @@ if __name__ == "main":
                 index = sl.market_currency_list.index(pair)
                 sl.fresh_prices[index] = price
             dcw.csv_logger(pairs=sl.market_currency_list, time_list=[
-                current_time], existing_data=[sl.fresh_prices], path="C:/DCWLog/Test/")
+                current_time], price_data=[sl.fresh_prices], path="C:/DCWLog/Test/")
             sl.log_loop_tracker += 1
             time.sleep(1.5)
