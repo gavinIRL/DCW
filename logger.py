@@ -25,8 +25,12 @@ class StandaloneLogger():
         self.buffer_counter = 1
         self.buffer_size = 20
         self.fresh_prices = []
+        self.log_start_time = []
+        self.file_list = []
         for curr in self.market_currency_list:
             self.fresh_prices.append(1.2)
+            self.log_start_time.append(0)
+            self.file_list.append(".")
         self.last_50_closes_5min = []
         self.last_50_closes_1hr = []
 
@@ -107,38 +111,60 @@ class StandaloneLogger():
     def calculate_rsi_logger(sequence, time_period):
         return ta.RSI(np.array(sequence), time_period)
 
-    def csv_writer_thread_handler(self, curr_index, filepath, indicators=True):
+    def csv_writer_thread_handler(self, curr_index, folder_path, indicators=True):
         # This will calculate the rsi and ma values for a given currency
         # The calculations will be based on the prices saved in StandaloneLogger class
         # And then finally it will append/write to the relevant file
-
+        pair = self.market_currency_list[curr_index]
+        # Check whether to use the start time value
+        newfile = False
+        if self.log_start_time[curr_index] == 0:
+            self.log_start_time[curr_index] = str(self.convert_ms_to_datetime_logger(
+                self.buffer_times[0])).replace("-", "")
+            self.log_start_time[curr_index].replace(" ", "-").split(".")[0]
+            self.log_start_time[curr_index].replace(":", "")
+        # Then create the file name
+        filename = str(pair)+"-" + str(self.log_start_time)+".csv"
+        filename = folder_path + str(filename)
         # The csv file format should be as follows:
         # time, price, ma(50)5m, ma(50)1h, rsi(6)5m, rsi(6)1h, rsi(14)5m, rsi(14)1h
-        if indicators:
-            # Need to grab the appropriate data
-            # For example need to have the klines for last 50 5min segments
-            # And also the last 50 1hr segments
-            list_lines = []
-            for i, price in enumerate(self.buffer_data):
-                time_entry = self.buffer_times[i]
-                data_5min = self.last_50_closes_5min + [price]
-                data_1hr = self.last_50_closes_1hr + [price]
-                ma_50_5min = self.calculate_ma_logger(data_5min, 50)[-1]
-                ma_50_1hr = self.calculate_ma_logger(data_1hr, 50)[-1]
-                data_5min = self.last_50_closes_5min[-16:] + [price]
-                data_1hr = self.last_50_closes_1hr[-16:] + [price]
-                rsi_6_5min = self.calculate_rsi_logger(data_5min, 6)[-1]
-                rsi_6_1hr = self.calculate_rsi_logger(data_1hr, 6)[-1]
-                rsi_14_5min = self.calculate_rsi_logger(data_5min, 14)[-1]
-                rsi_14_1hr = self.calculate_rsi_logger(data_1hr, 14)[-1]
+        list_lines = []
+        # Need to grab the appropriate data
+        # For example need to have the klines for last 50 5min segments
+        # And also the last 50 1hr segments
+        for i, price in enumerate(self.buffer_data[curr_index]):
+            time_entry = self.buffer_times[i]
+            data_5min = self.last_50_closes_5min[curr_index] + [price]
+            data_1hr = self.last_50_closes_1hr[curr_index] + [price]
+            ma_50_5min = self.calculate_ma_logger(data_5min, 50)[-1]
+            ma_50_1hr = self.calculate_ma_logger(data_1hr, 50)[-1]
+            data_5min = self.last_50_closes_5min[curr_index][-16:] + [price]
+            data_1hr = self.last_50_closes_1hr[curr_index][-16:] + [price]
+            rsi_6_5min = self.calculate_rsi_logger(data_5min, 6)[-1]
+            rsi_6_1hr = self.calculate_rsi_logger(data_1hr, 6)[-1]
+            rsi_14_5min = self.calculate_rsi_logger(data_5min, 14)[-1]
+            rsi_14_1hr = self.calculate_rsi_logger(data_1hr, 14)[-1]
+            if indicators:
                 line = time_entry + ","+price + ","+ma_50_5min+","+ma_50_1hr+"," + \
-                    rsi_6_5min+","+rsi_6_1hr+","+rsi_14_5min+","+rsi_14_1hr
-                list_lines.append(line)
-
-            # And then write the data to the file
-            # First check if the folder exists
-
-            # Then check if the file already exists and then either append or write as required
+                    rsi_6_5min+","+rsi_6_1hr+","+rsi_14_5min+","+rsi_14_1hr + "\n"
+            else:
+                line = time_entry + ","+price + "\n"
+            list_lines.append(line)
+        # And then write the data to the file
+        # First check if the folder exists
+        if not os.path.exists(folder_path):
+            os.mkdir(folder_path)
+        # Then check if the file already exists and then either append or write as required
+        # Check if file already exists
+        if not os.path.isfile(filename):
+            with open(filename, "w") as file:
+                for line in list_lines:
+                    file.write(line)
+        # Otherwise append
+        else:
+            with open(filename, "a") as file:
+                for line in list_lines:
+                    file.write(line)
 
     def csv_logger_lightweight(self, pairs: list, time_list=False, price_data=False, buffer=20, path=False):
         # This can accept multiple lines of data at once
