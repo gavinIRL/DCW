@@ -11,18 +11,17 @@ Note: This is a simple application for my own personal use, and I'm using this m
 5) Logging prices of top 20 currencies to csv file for bot training (lightweight standalone)
 
 
-## Planned Core Features:
+## Remaining Planned Core Features:
 This list gets updated frequently as some features are moved up or down the priority queue based on personal preference, in particular if there is a bigger learning opportunity as that is the main focus of this project.
-1)
-
-## Planned Additional Features
-This list gets updated frequently as some features are moved up or down the priority queue based on personal preference, in particular if there is a bigger learning opportunity as that is the main focus of this project.
-2)
-
-
+1) Bot Sandbox
+2) Bot Generator
+3) Bot Evaluator
 The above features will be added as issues to track their progress. If certain features are taking a long time to develop then additional issues will be added to break down the feature into sub-parts.
-
-## Multiple API's
-The intent is to make use of different API's for primarily the same purpose but also utilising certain ones to their strengths. Also useful for the comparison of prices across API's for spotting trends later. 
-
-Initial API's used are Bitfinex and Binance
+## Remaining Planned Additional Features
+This list gets updated frequently as some features are moved up or down the priority queue based on personal preference, in particular if there is a bigger learning opportunity as that is the main focus of this project.
+1) Bitfinex API Integration
+2) Functional Alerts Window
+3) More Advanced Chart/Analysis Window
+4) Functional Settings Window
+5) Wallet Window (for logging of PnL, history, etc.)
+The above features will be added as issues to track their progress. If certain features are taking a long time to develop then additional issues will be added to break down the feature into sub-parts.
