@@ -166,50 +166,25 @@ class StandaloneLogger():
                 for line in list_lines:
                     file.write(line)
 
-    def csv_logger_lightweight(self, pairs: list, time_list=False, price_data=False, buffer=20, path=False):
-        # This can accept multiple lines of data at once
-        start_time = time_list[0]
-        # Will use a single list instead of multiple lists for price_data in lightweight version
-        # Then check whether to use the start time value
+    def csv_logger_lightweight(self, path=False):
+        # First grab the current time
+        current_time = time.time()
         clean_format_time = str(self.convert_ms_to_datetime_logger(
-            start_time)).replace("-", "")
+            current_time)).replace("-", "")
         clean_format_time = clean_format_time.replace(" ", "-").split(".")[0]
         clean_format_time = clean_format_time.replace(":", "")
-        if self.log_start_time == 0:
-            self.log_start_time = clean_format_time
+        # Now grab the current prices
+        price_data = self.get_tick_logger(self.market_currency_list)
         # Then update the buffer data
         self.buffer_times.append(clean_format_time)
-        self.buffer_data.append(price_data.copy())
+        self.buffer_data.append(price_data)
         # Then write to the files every time 10 ticks are saved up
-        if self.buffer_counter >= buffer:
+        if self.buffer_counter >= self.buffer_size:
             self.buffer_counter = 0
-            for i, pair in enumerate(pairs):
-
-                filename = str(pair)+"-" + \
-                    str(self.log_start_time)+".csv"
-                if path:
-                    folder_path = str(path) + str(pair) + "/"
-                    if not os.path.exists(folder_path):
-                        os.mkdir(folder_path)
-                    filename = folder_path + str(filename)
-                else:
-                    folder_path = "D:/DCWLog/" + str(pair) + "/"
-                    if not os.path.exists(folder_path):
-                        os.mkdir(folder_path)
-                    filename = folder_path + filename
-                # Check if file already exists
-                if not os.path.isfile(filename):
-                    with open(filename, "w") as file:
-                        for j, line in enumerate(self.buffer_times):
-                            csv_data = self.buffer_data[j][i]
-                            file.write(str(line)+","+str(csv_data)+"\n")
-                # Otherwise append
-                else:
-                    with open(filename, "a") as file:
-                        for j, line in enumerate(self.buffer_times):
-                            csv_data = self.buffer_data[j][i]
-                            file.write(str(line)+","+str(csv_data)+"\n")
-            # Then reset the buffer
+            # Send information to the threaded tasks
+            for currency in self.market_currency_list:
+                # Do something
+                pass
             self.buffer_times = []
             self.buffer_data = []
         else:
