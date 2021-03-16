@@ -13,6 +13,7 @@ import json
 import requests
 import talib as ta
 import numpy as np
+import threading
 
 
 class StandaloneLogger():
@@ -22,6 +23,7 @@ class StandaloneLogger():
             "BCHUSDT", "DOGEUSDT", "XEMUSDT", "ATOMUSDT", "XMRUSDT", "EOSUSDT", "TRXUSDT"]
         self.log_loop_tracker = 0
         self.buffer_counter = 1
+        self.buffer_size = 20
         self.fresh_prices = []
         for curr in self.market_currency_list:
             self.fresh_prices.append(1.2)
@@ -109,25 +111,34 @@ class StandaloneLogger():
         # This will calculate the rsi and ma values for a given currency
         # The calculations will be based on the prices saved in StandaloneLogger class
         # And then finally it will append/write to the relevant file
-        line = ""
+
+        # The csv file format should be as follows:
+        # time, price, ma(50)5m, ma(50)1h, rsi(6)5m, rsi(6)1h, rsi(14)5m, rsi(14)1h
         if indicators:
             # Need to grab the appropriate data
             # For example need to have the klines for last 50 5min segments
             # And also the last 50 1hr segments
-            data_5min = []
-            data_1hr = []
-            ma_50_5min = self.calculate_ma_logger(data_5min, 50)[-1]
-            ma_50_1hr = self.calculate_ma_logger(data_1hr, 50)[-1]
-            rsi_6_5min = self.calculate_rsi_logger(data_5min, 6)[-1]
-            rsi_6_1hr = self.calculate_rsi_logger(data_1hr, 6)[-1]
-            rsi_14_5min = self.calculate_rsi_logger(data_5min, 14)[-1]
-            rsi_14_1hr = self.calculate_rsi_logger(data_1hr, 14)[-1]
-            line = line + ","+ma_50_5min+","+ma_50_1hr+"," + \
-                rsi_6_5min+","+rsi_6_1hr+","+rsi_14_5min+","+rsi_14_1hr
-        # And then write the data to the file
-        # First check if the folder exists
+            list_lines = []
+            for i, price in enumerate(self.buffer_data):
+                time_entry = self.buffer_times[i]
+                data_5min = self.last_50_closes_5min + [price]
+                data_1hr = self.last_50_closes_1hr + [price]
+                ma_50_5min = self.calculate_ma_logger(data_5min, 50)[-1]
+                ma_50_1hr = self.calculate_ma_logger(data_1hr, 50)[-1]
+                data_5min = self.last_50_closes_5min[-16:] + [price]
+                data_1hr = self.last_50_closes_1hr[-16:] + [price]
+                rsi_6_5min = self.calculate_rsi_logger(data_5min, 6)[-1]
+                rsi_6_1hr = self.calculate_rsi_logger(data_1hr, 6)[-1]
+                rsi_14_5min = self.calculate_rsi_logger(data_5min, 14)[-1]
+                rsi_14_1hr = self.calculate_rsi_logger(data_1hr, 14)[-1]
+                line = time_entry + ","+price + ","+ma_50_5min+","+ma_50_1hr+"," + \
+                    rsi_6_5min+","+rsi_6_1hr+","+rsi_14_5min+","+rsi_14_1hr
+                list_lines.append(line)
 
-        # Then check if the file already exists and then either append or write as required
+            # And then write the data to the file
+            # First check if the folder exists
+
+            # Then check if the file already exists and then either append or write as required
 
     def csv_logger_lightweight(self, pairs: list, time_list=False, price_data=False, buffer=20, path=False):
         # This can accept multiple lines of data at once
@@ -183,7 +194,7 @@ if __name__ == "main":
     sl = StandaloneLogger()
 
     def update_prices():
-        while sl.log_loop_tracker < 1000:
+        while sl.log_loop_tracker < 10:
             current_time = time.time()
             fresh_data = sl.get_tick_logger(sl.market_currency_list)
             for pair, price in fresh_data.items():
