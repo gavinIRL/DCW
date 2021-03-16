@@ -16,6 +16,7 @@ This list gets updated frequently as some features are moved up or down the prio
 1) Bot Sandbox
 2) Bot Generator
 3) Bot Evaluator
+
 The above features will be added as issues to track their progress. If certain features are taking a long time to develop then additional issues will be added to break down the feature into sub-parts.
 ## Remaining Planned Additional Features
 This list gets updated frequently as some features are moved up or down the priority queue based on personal preference, in particular if there is a bigger learning opportunity as that is the main focus of this project.
@@ -24,4 +25,5 @@ This list gets updated frequently as some features are moved up or down the prio
 3) More Advanced Chart/Analysis Window
 4) Functional Settings Window
 5) Wallet Window (for logging of PnL, history, etc.)
+
 The above features will be added as issues to track their progress. If certain features are taking a long time to develop then additional issues will be added to break down the feature into sub-parts.
