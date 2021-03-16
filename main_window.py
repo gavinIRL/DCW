@@ -1,4 +1,4 @@
-import threading
+
 import tkinter as tk
 import tkinter.font as tkFont
 from dcw_utils import DCWUtils

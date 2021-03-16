@@ -34,6 +34,8 @@ class StandaloneLogger():
         self.last_50_closes_5min = []
         self.last_50_closes_1hr = []
 
+        self.threads = []
+
     def get_tick_logger(self, pair=False):
         if isinstance(pair, str):
             data = self.request_api_logger("ticker/price?symbol="+pair)
@@ -182,9 +184,12 @@ class StandaloneLogger():
         if self.buffer_counter >= self.buffer_size:
             self.buffer_counter = 0
             # Send information to the threaded tasks
-            for currency in self.market_currency_list:
+            for i, currency in enumerate(self.market_currency_list):
                 # Do something
-                pass
+                t = threading.Thread(target=self.csv_writer_thread_handler,
+                                     args=(i, path))
+                self.threads.append(t)
+                t.start()
             self.buffer_times = []
             self.buffer_data = []
         else:
@@ -193,15 +198,7 @@ class StandaloneLogger():
 
 if __name__ == "main":
     sl = StandaloneLogger()
-
-    def update_prices():
-        while sl.log_loop_tracker < 10:
-            current_time = time.time()
-            fresh_data = sl.get_tick_logger(sl.market_currency_list)
-            for pair, price in fresh_data.items():
-                index = sl.market_currency_list.index(pair)
-                sl.fresh_prices[index] = price
-            sl.csv_logger_lightweight(pairs=sl.market_currency_list, time_list=[
-                current_time], price_data=[sl.fresh_prices], path="C:/DCWLog/Test/")
-            sl.log_loop_tracker += 1
-            time.sleep(1.5)
+    while sl.log_loop_tracker < 100:
+        sl.csv_logger_lightweight(path="C:/DCWLog/Test/")
+        sl.log_loop_tracker += 1
+        time.sleep(1.5)
