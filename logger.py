@@ -194,11 +194,13 @@ class StandaloneLogger():
         else:
             self.buffer_counter += 1
 
-    def candle_thread_handler_5m():
+    def candle_thread_handler_5m(sleep_timer):
+        time.sleep(sleep_timer)
         # data_5m_1h = sl.get_candle(pair, "1m", 80)
         pass
 
-    def candle_thread_handler_1hr():
+    def candle_thread_handler_1hr(sleep_timer):
+        time.sleep(sleep_timer)
         # data_1d_1w = sl.get_candle(pair, "1h", 168)
         pass
 
