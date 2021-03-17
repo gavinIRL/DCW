@@ -1,5 +1,5 @@
 # DCW
-DesktopCryptoWatcher - Basic desktop GUI to pull and store data from multiple public APIs and display data such as your personal earnings/losses.
+DesktopCryptoWatcher - Basic desktop GUI to pull and store data from public API(s) and create and test ping-pong trading bots.
 
 Note: This is a simple application for my own personal use, and I'm using this mostly as a learning opporunity, I wanted to create my own application from scratch instead of using existing wrappers or software. I'll probably keep this ticking over in the background with small feature additions once the basic functionality has been implemented.
 
