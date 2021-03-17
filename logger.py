@@ -22,11 +22,14 @@ class StandaloneLogger():
             "BTCUSDT", "ETHUSDT", "ADAUSDT", "BNBUSDT", "DOTUSDT", "XRPUSDT", "LTCUSDT", "XLMUSDT",
             "BCHUSDT", "DOGEUSDT", "XEMUSDT", "ATOMUSDT", "XMRUSDT", "EOSUSDT", "TRXUSDT"]
         self.log_loop_tracker = 0
+        self.candle_loop_tracker = 0
         self.buffer_counter = 1
         self.buffer_size = 20
         self.fresh_prices = []
         self.log_start_time = []
         self.file_list = []
+        self.buffer_times = []
+        self.buffer_data = []
         for curr in self.market_currency_list:
             self.fresh_prices.append(1.2)
             self.log_start_time.append(0)
@@ -118,13 +121,6 @@ class StandaloneLogger():
         # The calculations will be based on the prices saved in StandaloneLogger class
         # And then finally it will append/write to the relevant file
         pair = self.market_currency_list[curr_index]
-        # Check whether to use the start time value
-        newfile = False
-        if self.log_start_time[curr_index] == 0:
-            self.log_start_time[curr_index] = str(self.convert_ms_to_datetime_logger(
-                self.buffer_times[0])).replace("-", "")
-            self.log_start_time[curr_index].replace(" ", "-").split(".")[0]
-            self.log_start_time[curr_index].replace(":", "")
         # Then create the file name
         filename = str(pair)+"-" + str(self.log_start_time)+".csv"
         filename = folder_path + str(filename)
@@ -169,6 +165,7 @@ class StandaloneLogger():
                     file.write(line)
 
     def csv_logger_lightweight(self, path=False):
+        # print("Got here #1")
         # First grab the current time
         current_time = time.time()
         clean_format_time = str(self.convert_ms_to_datetime_logger(
@@ -182,10 +179,12 @@ class StandaloneLogger():
         self.buffer_data.append(price_data)
         # Then write to the files every time 10 ticks are saved up
         if self.buffer_counter >= self.buffer_size:
+            # print("Got here #2")
             self.buffer_counter = 0
             # Send information to the threaded tasks
             for i, currency in enumerate(self.market_currency_list):
                 # Do something
+                # print("Got here #3")
                 t = threading.Thread(target=self.csv_writer_thread_handler,
                                      args=(i, path))
                 self.threads.append(t)
@@ -195,10 +194,29 @@ class StandaloneLogger():
         else:
             self.buffer_counter += 1
 
+    def candle_thread_handler_5m():
+        # data_5m_1h = sl.get_candle(pair, "1m", 80)
+        pass
 
-if __name__ == "main":
+    def candle_thread_handler_1hr():
+        # data_1d_1w = sl.get_candle(pair, "1h", 168)
+        pass
+
+
+if __name__ == "__main__":
     sl = StandaloneLogger()
+    sl.buffer_size = 5
     while sl.log_loop_tracker < 100:
+        # Need to grab the candles every so often
+        if sl.candle_loop_tracker == 0:
+            # Grab the candles
+            for delay, pair in sl.market_currency_list:
+                pass
+        elif sl.candle_loop_tracker >= 49:
+            sl.candle_loop_tracker = 0
+        else:
+            sl.candle_loop_tracker += 1
+
         sl.csv_logger_lightweight(path="C:/DCWLog/Test/")
         sl.log_loop_tracker += 1
-        time.sleep(1.5)
+        time.sleep(2.5)
