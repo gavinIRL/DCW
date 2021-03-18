@@ -143,12 +143,12 @@ class StandaloneLogger():
         # And also the last 50 1hr segments
         for i, price in enumerate(self.buffer_data[curr_index]):
             time_entry = self.buffer_times[i]
-            data_5min = self.last_50_closes_5min[curr_index] + [price]
-            data_1hr = self.last_50_closes_1hr[curr_index] + [price]
+            data_5min = self.last_50_closes_5min[curr_index]
+            data_1hr = self.last_50_closes_1hr[curr_index]
             ma_50_5min = self.calculate_ma_logger(data_5min, 50)[-1]
             ma_50_1hr = self.calculate_ma_logger(data_1hr, 50)[-1]
-            data_5min = self.last_50_closes_5min[curr_index][-16:] + [price]
-            data_1hr = self.last_50_closes_1hr[curr_index][-16:] + [price]
+            data_5min = self.last_50_closes_5min[curr_index][-16:]
+            data_1hr = self.last_50_closes_1hr[curr_index][-16:]
             rsi_6_5min = self.calculate_rsi_logger(data_5min, 6)[-1]
             rsi_6_1hr = self.calculate_rsi_logger(data_1hr, 6)[-1]
             rsi_14_5min = self.calculate_rsi_logger(data_5min, 14)[-1]
@@ -185,6 +185,11 @@ class StandaloneLogger():
         clean_format_time = clean_format_time.replace(":", "")
         # Now grab the current prices
         price_data = self.get_tick_logger(self.pair_list)
+        # Now update the last value in the last 50 closes
+        for pair, price in price_data:
+            curr_index = self.pair_list.index(pair)
+            self.last_50_closes_5min[curr_index][-1] = price
+            self.last_50_closes_1hr[curr_index][-1] = price
         # Then update the buffer data
         self.buffer_times.append(clean_format_time)
         self.buffer_data.append(price_data)
