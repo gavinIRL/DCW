@@ -17,7 +17,8 @@ import threading
 
 
 class StandaloneLogger():
-    def __init__(self):
+    def __init__(self, output_path="C:/DCWLog/Test/"):
+        self.path = output_path
         self.market_currency_list = [
             "BTCUSDT", "ETHUSDT", "ADAUSDT", "BNBUSDT", "DOTUSDT", "XRPUSDT", "LTCUSDT", "XLMUSDT",
             "BCHUSDT", "DOGEUSDT", "XEMUSDT", "ATOMUSDT", "XMRUSDT", "EOSUSDT", "TRXUSDT"]
@@ -36,8 +37,11 @@ class StandaloneLogger():
             self.file_list.append(".")
         self.last_50_closes_5min = []
         self.last_50_closes_1hr = []
+        self.last_50_oohlcvc_5min = []
+        self.last_50_oohlcvc_1hr = []
 
         self.threads = []
+        self.sleep_spacing_mult = 0.25
 
     def get_tick_logger(self, pair=False):
         if isinstance(pair, str):
@@ -123,7 +127,10 @@ class StandaloneLogger():
         pair = self.market_currency_list[curr_index]
         # Then create the file name
         filename = str(pair)+"-" + str(self.log_start_time)+".csv"
-        filename = folder_path + str(filename)
+        if folder_path:
+            filename = folder_path + str(filename)
+        else:
+            filename = self.path + str(filename)
         # The csv file format should be as follows:
         # time, price, ma(50)5m, ma(50)1h, rsi(6)5m, rsi(6)1h, rsi(14)5m, rsi(14)1h
         list_lines = []
@@ -194,15 +201,31 @@ class StandaloneLogger():
         else:
             self.buffer_counter += 1
 
-    def candle_thread_handler_5m(sleep_timer):
-        time.sleep(sleep_timer)
-        # data_5m_1h = sl.get_candle(pair, "1m", 80)
-        pass
+    def get_candle(self, pair: str, interval: str, limit: int):
 
-    def candle_thread_handler_1hr(sleep_timer):
-        time.sleep(sleep_timer)
-        # data_1d_1w = sl.get_candle(pair, "1h", 168)
-        pass
+        data = self.request_api(
+            "klines?symbol="+pair+"&interval="+interval+"&limit="+str(limit))
+        return_data = []
+        for row in data:
+            # Don't want all the entries
+            timepoint = {}
+            timepoint["Open Time"] = row[0]
+            timepoint["Open"] = row[1]
+            timepoint["High"] = row[2]
+            timepoint["Low"] = row[3]
+            timepoint["Close"] = row[4]
+            timepoint["Volume"] = row[5]
+            timepoint["Close Time"] = row[6]
+            return_data.append(timepoint)
+        return return_data
+
+    def candle_thread_handler_5m(self, pair, sleep_timer):
+        time.sleep(sleep_timer*self.sleep_spacing_mult)
+        data5m = sl.get_candle(pair, "5m", limit=50)
+
+    def candle_thread_handler_1hr(self, pair, sleep_timer):
+        time.sleep(sleep_timer*self.sleep_spacing_mult*1.5)
+        data1hr = sl.get_candle(pair, "1h", limit=50)
 
 
 if __name__ == "__main__":
@@ -212,13 +235,20 @@ if __name__ == "__main__":
         # Need to grab the candles every so often
         if sl.candle_loop_tracker == 0:
             # Grab the candles
-            for delay, pair in sl.market_currency_list:
-                pass
+            for delay, pair in enumerate(sl.market_currency_list):
+                t = threading.Thread(target=sl.candle_thread_handler_5m,
+                                     args=(pair, delay))
+                sl.threads.append(t)
+                t.start()
+                t2 = threading.Thread(target=sl.candle_thread_handler_1hr,
+                                      args=(pair, delay))
+                sl.threads.append(t2)
+                t2.start()
         elif sl.candle_loop_tracker >= 49:
             sl.candle_loop_tracker = 0
         else:
             sl.candle_loop_tracker += 1
 
-        sl.csv_logger_lightweight(path="C:/DCWLog/Test/")
+        sl.csv_logger_lightweight()
         sl.log_loop_tracker += 1
         time.sleep(2.5)
