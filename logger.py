@@ -19,7 +19,7 @@ import threading
 class StandaloneLogger():
     def __init__(self, output_path="C:/DCWLog/Test/"):
         self.path = output_path
-        self.market_currency_list = [
+        self.pair_list = [
             "BTCUSDT", "ETHUSDT", "ADAUSDT", "BNBUSDT", "DOTUSDT", "XRPUSDT", "LTCUSDT", "XLMUSDT",
             "BCHUSDT", "DOGEUSDT", "XEMUSDT", "ATOMUSDT", "XMRUSDT", "EOSUSDT", "TRXUSDT"]
         self.log_loop_tracker = 0
@@ -31,14 +31,18 @@ class StandaloneLogger():
         self.file_list = []
         self.buffer_times = []
         self.buffer_data = []
-        for curr in self.market_currency_list:
-            self.fresh_prices.append(1.2)
-            self.log_start_time.append(0)
-            self.file_list.append(".")
         self.last_50_closes_5min = []
         self.last_50_closes_1hr = []
         self.last_50_oohlcvc_5min = []
         self.last_50_oohlcvc_1hr = []
+        for pair in self.pair_list:
+            self.fresh_prices.append(1.2)
+            self.log_start_time.append(0)
+            self.file_list.append(".")
+            self.last_50_closes_5min.append([])
+            self.last_50_closes_1hr.append([])
+            self.last_50_oohlcvc_5min.append([])
+            self.last_50_oohlcvc_1hr.append([])
 
         self.threads = []
         self.sleep_spacing_mult = 0.25
@@ -124,7 +128,7 @@ class StandaloneLogger():
         # This will calculate the rsi and ma values for a given currency
         # The calculations will be based on the prices saved in StandaloneLogger class
         # And then finally it will append/write to the relevant file
-        pair = self.market_currency_list[curr_index]
+        pair = self.pair_list[curr_index]
         # Then create the file name
         filename = str(pair)+"-" + str(self.log_start_time)+".csv"
         if folder_path:
@@ -180,7 +184,7 @@ class StandaloneLogger():
         clean_format_time = clean_format_time.replace(" ", "-").split(".")[0]
         clean_format_time = clean_format_time.replace(":", "")
         # Now grab the current prices
-        price_data = self.get_tick_logger(self.market_currency_list)
+        price_data = self.get_tick_logger(self.pair_list)
         # Then update the buffer data
         self.buffer_times.append(clean_format_time)
         self.buffer_data.append(price_data)
@@ -189,7 +193,7 @@ class StandaloneLogger():
             # print("Got here #2")
             self.buffer_counter = 0
             # Send information to the threaded tasks
-            for i, currency in enumerate(self.market_currency_list):
+            for i, currency in enumerate(self.pair_list):
                 # Do something
                 # print("Got here #3")
                 t = threading.Thread(target=self.csv_writer_thread_handler,
@@ -220,12 +224,22 @@ class StandaloneLogger():
         return return_data
 
     def candle_thread_handler_5m(self, pair, sleep_timer):
+        index = self.pair_list.index(pair)
         time.sleep(sleep_timer*self.sleep_spacing_mult)
         data5m = sl.get_candle(pair, "5m", limit=50)
+        close_only = []
+        for entry in data5m:
+            close_only.append(entry["Close"])
+        self.last_50_closes_5min[index] = close_only
 
     def candle_thread_handler_1hr(self, pair, sleep_timer):
+        index = self.pair_list.index(pair)
         time.sleep(sleep_timer*self.sleep_spacing_mult*1.5)
-        data1hr = sl.get_candle(pair, "1h", limit=50)
+        data1h = sl.get_candle(pair, "1h", limit=50)
+        close_only = []
+        for entry in data1h:
+            close_only.append(entry["Close"])
+        self.last_50_closes_1hr[index] = close_only
 
 
 if __name__ == "__main__":
@@ -235,7 +249,7 @@ if __name__ == "__main__":
         # Need to grab the candles every so often
         if sl.candle_loop_tracker == 0:
             # Grab the candles
-            for delay, pair in enumerate(sl.market_currency_list):
+            for delay, pair in enumerate(sl.pair_list):
                 t = threading.Thread(target=sl.candle_thread_handler_5m,
                                      args=(pair, delay))
                 sl.threads.append(t)
