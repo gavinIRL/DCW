@@ -211,7 +211,6 @@ class StandaloneLogger():
             self.buffer_counter += 1
 
     def get_candle(self, pair: str, interval: str, limit: int):
-
         data = self.request_api(
             "klines?symbol="+pair+"&interval="+interval+"&limit="+str(limit))
         return_data = []
@@ -236,6 +235,7 @@ class StandaloneLogger():
         for entry in data5m:
             close_only.append(entry["Close"])
         self.last_50_closes_5min[index] = close_only
+        self.last_50_oohlcvc_5min = data5m.copy()
 
     def candle_thread_handler_1hr(self, pair, sleep_timer):
         index = self.pair_list.index(pair)
@@ -245,6 +245,7 @@ class StandaloneLogger():
         for entry in data1h:
             close_only.append(entry["Close"])
         self.last_50_closes_1hr[index] = close_only
+        self.last_50_oohlcvc_1hr = data1h.copy()
 
 
 if __name__ == "__main__":
