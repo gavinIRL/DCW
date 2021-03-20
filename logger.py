@@ -52,9 +52,13 @@ class StandaloneLogger():
     def get_tick_logger(self, pair=False):
         if isinstance(pair, str):
             data = self.request_api_logger("ticker/price?symbol="+pair)
+            if not data:
+                return False
             return str(data["price"]).strip("0")
         elif isinstance(pair, list):
             data = self.request_api_logger("ticker/price")
+            if not data:
+                return False
             return_data = {}
             for entry in data:
                 if entry["symbol"] in pair:
@@ -196,34 +200,40 @@ class StandaloneLogger():
         clean_format_time = clean_format_time.replace(":", "")
         # Now grab the current prices
         price_data = self.get_tick_logger(self.pair_list)
-        # Now update the last value in the last 50 closes
-        for pair, price in price_data:
-            curr_index = self.pair_list.index(pair)
-            self.last_50_closes_5min[curr_index][-1] = price
-            self.last_50_closes_1hr[curr_index][-1] = price
-        # Then update the buffer data
-        self.buffer_times.append(clean_format_time)
-        self.buffer_data.append(price_data)
-        # Then write to the files every time 10 ticks are saved up
-        if self.buffer_counter >= self.buffer_size:
-            # print("Got here #2")
-            self.buffer_counter = 0
-            # Send information to the threaded tasks
-            for i, currency in enumerate(self.pair_list):
-                # Do something
-                # print("Got here #3")
-                t = threading.Thread(target=self.csv_writer_thread_handler,
-                                     args=(i, path))
-                self.threads.append(t)
-                t.start()
-            self.buffer_times = []
-            self.buffer_data = []
+        # Check that there wasn't an error
+        if price_data:
+            # Now update the last value in the last 50 closes
+            for pair, price in price_data:
+                curr_index = self.pair_list.index(pair)
+                self.last_50_closes_5min[curr_index][-1] = price
+                self.last_50_closes_1hr[curr_index][-1] = price
+            # Then update the buffer data
+            self.buffer_times.append(clean_format_time)
+            self.buffer_data.append(price_data)
+            # Then write to the files every time 10 ticks are saved up
+            if self.buffer_counter >= self.buffer_size:
+                # print("Got here #2")
+                self.buffer_counter = 0
+                # Send information to the threaded tasks
+                for i, currency in enumerate(self.pair_list):
+                    # Do something
+                    # print("Got here #3")
+                    t = threading.Thread(target=self.csv_writer_thread_handler,
+                                         args=(i, path))
+                    self.threads.append(t)
+                    t.start()
+                self.buffer_times = []
+                self.buffer_data = []
+            else:
+                self.buffer_counter += 1
         else:
-            self.buffer_counter += 1
+            time.sleep(sl.current_timeout)
 
     def get_candle(self, pair: str, interval: str, limit: int):
         data = self.request_api_logger(
             "klines?symbol="+pair+"&interval="+interval+"&limit="+str(limit))
+        if not data:
+            return False
         return_data = []
         for row in data:
             # Don't want all the entries
