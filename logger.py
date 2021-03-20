@@ -45,6 +45,7 @@ class StandaloneLogger():
             self.last_50_oohlcvc_5min.append([])
             self.last_50_oohlcvc_1hr.append([])
 
+        self.current_timeout = 0
         self.threads = []
         self.sleep_spacing_mult = 0.25
 
@@ -69,12 +70,18 @@ class StandaloneLogger():
         try:
             response = requests.request("GET", url)
             if response.status_code == 200:
+                if self.current_timeout != 0:
+                    if self.current_timeout < 1:
+                        self.current_timeout = 0
+                    else:
+                        self.current_timeout = self.current_timeout/2
                 return json.loads(response.text)
             elif response.status_code == 404:
                 print("Incorrect input, got 404'd")
                 return False
             elif response.status_code == 429 or response.status_code == 418:
                 wait_seconds = int(response.headers["Retry-After"])
+                self.current_timeout = wait_seconds
                 print("Making too many requests, on the naughty step for " +
                       str(wait_seconds)+" seconds")
                 time.sleep(wait_seconds)
@@ -233,6 +240,8 @@ class StandaloneLogger():
 
     def candle_thread_handler_5m(self, pair, sleep_timer):
         index = self.pair_list.index(pair)
+        if self.current_timeout != 0:
+            time.sleep(self.current_timeout)
         time.sleep(sleep_timer*self.sleep_spacing_mult)
         data5m = sl.get_candle(pair, "5m", limit=50)
         close_only = []
@@ -243,6 +252,8 @@ class StandaloneLogger():
 
     def candle_thread_handler_1hr(self, pair, sleep_timer):
         index = self.pair_list.index(pair)
+        if self.current_timeout != 0:
+            time.sleep(self.current_timeout)
         time.sleep(sleep_timer*self.sleep_spacing_mult*1.5)
         data1h = sl.get_candle(pair, "1h", limit=50)
         close_only = []
