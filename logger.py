@@ -17,15 +17,16 @@ import threading
 
 
 class StandaloneLogger():
-    def __init__(self, output_path="C:/DCWLog/Test/"):
+    def __init__(self, output_path="C:/DCWLog/Test/", buffer_size=20, candle_loop_size=50):
         self.path = output_path
+        self.buffer_size = buffer_size
+        self.candle_loop_size = candle_loop_size
         self.pair_list = [
             "BTCUSDT", "ETHUSDT", "ADAUSDT", "BNBUSDT", "DOTUSDT", "XRPUSDT", "LTCUSDT", "XLMUSDT",
             "BCHUSDT", "DOGEUSDT", "XEMUSDT", "ATOMUSDT", "XMRUSDT", "EOSUSDT", "TRXUSDT"]
         self.log_loop_tracker = 0
-        self.candle_loop_tracker = 0
+        self.candle_loop_tracker = 1
         self.buffer_counter = 1
-        self.buffer_size = 20
         self.fresh_prices = []
         self.log_start_time = []
         self.file_list = []
@@ -248,12 +249,11 @@ class StandaloneLogger():
         self.last_50_oohlcvc_1hr = data1h.copy()
 
 
-if __name__ == "__main__":
-    sl = StandaloneLogger()
-    sl.buffer_size = 5
+def main_loop(sl, max_loops=100, sleep_time=2.5):
     while sl.log_loop_tracker < 100:
         # Need to grab the candles every so often
-        if sl.candle_loop_tracker == 0:
+        if sl.candle_loop_tracker == 1:
+            sl.candle_loop_tracker += 1
             # Grab the candles
             for delay, pair in enumerate(sl.pair_list):
                 t = threading.Thread(target=sl.candle_thread_handler_5m,
@@ -264,11 +264,16 @@ if __name__ == "__main__":
                                       args=(pair, delay))
                 sl.threads.append(t2)
                 t2.start()
-        elif sl.candle_loop_tracker >= 49:
-            sl.candle_loop_tracker = 0
+        elif sl.candle_loop_tracker >= sl.candle_loop_size:
+            sl.candle_loop_tracker = 1
         else:
             sl.candle_loop_tracker += 1
 
         sl.csv_logger_lightweight()
         sl.log_loop_tracker += 1
         time.sleep(2.5)
+
+
+if __name__ == "__main__":
+    sl = StandaloneLogger(buffer_size=5)
+    main_loop(sl)
