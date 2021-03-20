@@ -249,8 +249,8 @@ class StandaloneLogger():
         self.last_50_oohlcvc_1hr = data1h.copy()
 
 
-def main_loop(sl, max_loops=100, sleep_time=2.5):
-    while sl.log_loop_tracker < 100:
+def main_loop(sl: StandaloneLogger, max_loops=100, sleep_time=2.5):
+    while sl.log_loop_tracker < max_loops:
         # Need to grab the candles every so often
         if sl.candle_loop_tracker == 1:
             sl.candle_loop_tracker += 1
@@ -271,7 +271,7 @@ def main_loop(sl, max_loops=100, sleep_time=2.5):
 
         sl.csv_logger_lightweight()
         sl.log_loop_tracker += 1
-        time.sleep(2.5)
+        time.sleep(sleep_time)
 
 
 if __name__ == "__main__":
