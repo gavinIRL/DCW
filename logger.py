@@ -215,7 +215,7 @@ class StandaloneLogger():
             self.buffer_counter += 1
 
     def get_candle(self, pair: str, interval: str, limit: int):
-        data = self.request_api(
+        data = self.request_api_logger(
             "klines?symbol="+pair+"&interval="+interval+"&limit="+str(limit))
         return_data = []
         for row in data:
