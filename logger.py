@@ -36,7 +36,7 @@ class StandaloneLogger():
         self.last_50_closes_1hr = []
         self.last_50_oohlcvc_5min = []
         self.last_50_oohlcvc_1hr = []
-        for pair in self.pair_list:
+        for i in range(len(self.pair_list)):
             self.fresh_prices.append(1.2)
             self.log_start_time.append(0)
             self.file_list.append(".")
@@ -104,6 +104,9 @@ class StandaloneLogger():
         target_date = base_datetime + delta
         return target_date
 
+    # Having these methods more visible for clarity
+    # And to prevent error of sequence not being a numpy array
+    # Because I will retire from programming if I make that error once more
     def calculate_ma_logger(sequence, time_period):
         return ta.MA(np.array(sequence), time_period)
 
