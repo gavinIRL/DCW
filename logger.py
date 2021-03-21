@@ -1,9 +1,6 @@
 # This is meant as a standalone logging script for creating bot training datasets
-# To-do list:
-# 3) Need to store values for calculating rsi(14) for 1hr and everything below that
-# 4) The final csv file format should be as follows:
-# time ms, price, ma(50)5m, ma(50)1h, rsi(6)5m, rsi(6)1h, rsi(14)5m, rsi(14)1h
-# 5) Potentially update the format to include more information later
+# The final csv file format should be as follows:
+# time ms, price, ma(50)5m, ma(50)1h, rsi(6)5m, rsi(6)1h, rsi(14)5m, rsi(14)1h, 5m volume, 1hr volume
 from dcw_utils import DCWUtils
 import time
 import datetime
@@ -168,9 +165,13 @@ class StandaloneLogger():
             rsi_6_1hr = self.calculate_rsi_logger(data_1hr, 6)[-1]
             rsi_14_5min = self.calculate_rsi_logger(data_5min, 14)[-1]
             rsi_14_1hr = self.calculate_rsi_logger(data_1hr, 14)[-1]
+            # TBD need to grab volume data and append also
+            volume_5m = self.last_50_oohlcvc_5min[curr_index][-1]["Volume"]
+            volume_1h = self.last_50_oohlcvc_1hr[curr_index][-1]["Volume"]
             if indicators:
                 line = time_entry + ","+price + ","+ma_50_5min+","+ma_50_1hr+"," + \
-                    rsi_6_5min+","+rsi_6_1hr+","+rsi_14_5min+","+rsi_14_1hr + "\n"
+                    rsi_6_5min+","+rsi_6_1hr+","+rsi_14_5min+","+rsi_14_1hr + "," + \
+                    volume_5m+","+volume_1h+"\n"
             else:
                 line = time_entry + ","+price + "\n"
             list_lines.append(line)
