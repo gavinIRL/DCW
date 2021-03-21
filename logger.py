@@ -201,11 +201,13 @@ class StandaloneLogger():
         clean_format_time = clean_format_time.replace(":", "")
         # Now grab the current prices
         price_data = self.get_tick_logger(self.pair_list)
+        # print(price_data)
         # Check that there wasn't an error
         if price_data:
             # Now update the last value in the last 50 closes
-            for pair, price in price_data:
+            for pair, price in price_data.items():
                 curr_index = self.pair_list.index(pair)
+                # print(self.last_50_closes_5min)
                 self.last_50_closes_5min[curr_index][-1] = price
                 self.last_50_closes_1hr[curr_index][-1] = price
             # Then update the buffer data
