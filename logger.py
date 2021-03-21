@@ -204,10 +204,24 @@ class StandaloneLogger():
         # print(price_data)
         # Check that there wasn't an error
         if price_data:
+            # Run into a problem of not all threads being complete when get to this point unfortunately
+            # Only happens at the beginning, or more accurately only matters at beginning
+            # Therefore need to pause until information has come through for each currency
+            sleep_length = 0.5
+            while not self.last_50_closes_5min[-1] and not self.last_50_closes_1hr[-1]:
+                sleep_length += 0.5
+                print("Data not fully loaded yet, sleeping for " +
+                      str(sleep_length)+"s total")
+                time.sleep(0.5)
+            # Sleep for another half second anyway to make sure
+            if sleep_length > 0.5:
+                print("Data loaded, continuing")
+                time.sleep(0.5)
             # Now update the last value in the last 50 closes
             for pair, price in price_data.items():
                 curr_index = self.pair_list.index(pair)
-                # print(self.last_50_closes_5min)
+                print(curr_index)
+                # print(self.last_50_closes_1hr[curr_index][-1])
                 self.last_50_closes_5min[curr_index][-1] = price
                 self.last_50_closes_1hr[curr_index][-1] = price
             # Then update the buffer data
