@@ -157,6 +157,7 @@ class StandaloneLogger():
             time_entry = self.buffer_times[i]
             data_5min = self.last_50_closes_5min[curr_index]
             data_1hr = self.last_50_closes_1hr[curr_index]
+            print(data_5min)
             ma_50_5min = self.calculate_ma_logger(data_5min, 50)[-1]
             ma_50_1hr = self.calculate_ma_logger(data_1hr, 50)[-1]
             data_5min = self.last_50_closes_5min[curr_index][-16:]
@@ -208,7 +209,7 @@ class StandaloneLogger():
             # Only happens at the beginning, or more accurately only matters at beginning
             # Therefore need to pause until information has come through for each currency
             sleep_length = 0.5
-            while not self.last_50_closes_5min[-1] and not self.last_50_closes_1hr[-1]:
+            while not all(self.last_50_closes_5min) and not all(self.last_50_closes_1hr):
                 sleep_length += 0.5
                 print("Data not fully loaded yet, sleeping for " +
                       str(sleep_length)+"s total")
