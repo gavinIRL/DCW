@@ -16,17 +16,23 @@ import pathlib
 
 class StandaloneLogger():
     def __init__(self, output_path="C:\\DCWLog\\Test\\", buffer_size=20, candle_loop_size=50):
+        # Primary controlling object variables first
         self.path = output_path
         self.buffer_size = buffer_size
         self.candle_loop_size = candle_loop_size
+        self.sleep_spacing_mult = 0.25
         self.pair_list = [
             "BTCUSDT", "ETHUSDT", "ADAUSDT", "BNBUSDT", "DOTUSDT", "XRPUSDT", "LTCUSDT", "XLMUSDT",
             "BCHUSDT", "DOGEUSDT", "XEMUSDT", "ATOMUSDT", "XMRUSDT", "EOSUSDT", "TRXUSDT"]
+        # These are for keeping track of loops
+        # Required as object variables due to threading
         self.log_loop_tracker = 0
         self.candle_loop_tracker = 1
         self.buffer_counter = 1
-        self.fresh_prices = []
         self.log_start_time = 0
+        self.fresh_prices = []
+        # These are for holding the data
+        # Object variables for same reason as loop counters
         self.file_list = []
         self.buffer_times = []
         self.buffer_data = []
@@ -34,9 +40,9 @@ class StandaloneLogger():
         self.last_50_closes_1hr = []
         self.last_50_oohlcvc_5min = []
         self.last_50_oohlcvc_1hr = []
-
-        # This is for ensuring buffer data has been written
+        # This is for ensuring buffer data has been written before clearing
         self.buffer_written = []
+        # This is for ensuring can just edit rather than first appendings
         for i in range(len(self.pair_list)):
             self.fresh_prices.append(1.2)
             self.file_list.append(".")
@@ -45,10 +51,9 @@ class StandaloneLogger():
             self.last_50_oohlcvc_5min.append([])
             self.last_50_oohlcvc_1hr.append([])
             self.buffer_written.append(True)
-
+        # These are utility only
         self.current_timeout = 0
         self.threads = []
-        self.sleep_spacing_mult = 0.25
 
     def get_tick_logger(self, pair=False):
         if isinstance(pair, str):
