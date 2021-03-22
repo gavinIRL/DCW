@@ -235,10 +235,7 @@ class StandaloneLogger():
         # print("Got here #1")
         # First grab the current time
         current_time = time.time()
-        clean_format_time = str(self.convert_ms_to_datetime_logger(
-            current_time)).replace("-", "")
-        clean_format_time = clean_format_time.replace(" ", "-").split(".")[0]
-        clean_format_time = clean_format_time.replace(":", "")
+        clean_format_time = self.clean_format_time(current_time)
         # Now grab the current prices
         price_data = self.get_tick_logger(self.pair_list)
         # print(price_data)
@@ -356,14 +353,10 @@ def main_loop(sl: StandaloneLogger, max_loops=100, sleep_time=2.5):
             sl.candle_loop_tracker = 1
         else:
             sl.candle_loop_tracker += 1
+        # Handle the file naming at startup
         if sl.log_start_time == 0:
             current_time = time.time()
-            clean_format_time = str(sl.convert_ms_to_datetime_logger(
-                current_time)).replace("-", "")
-            clean_format_time = clean_format_time.replace(
-                " ", "-").split(".")[0]
-            clean_format_time = clean_format_time.replace(":", "")
-            sl.log_start_time = clean_format_time
+            sl.log_start_time = sl.clean_format_time(current_time)
         sl.csv_logger_lightweight()
         sl.log_loop_tracker += 1
         time.sleep(sleep_time)
