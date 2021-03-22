@@ -15,7 +15,7 @@ import pathlib
 
 
 class StandaloneLogger():
-    def __init__(self, output_path="C:/DCWLog/Test/", buffer_size=20, candle_loop_size=50):
+    def __init__(self, output_path="C:\\DCWLog\\Test\\", buffer_size=20, candle_loop_size=50):
         self.path = output_path
         self.buffer_size = buffer_size
         self.candle_loop_size = candle_loop_size
@@ -164,8 +164,10 @@ class StandaloneLogger():
         filename = str(pair)+"-" + str(self.log_start_time)+".csv"
         if folder_path:
             filename = folder_path + str(filename)
+            folder_path = os.getcwd()
         else:
             filename = self.path + str(filename)
+            folder_path = self.path
         # The csv file format should be as follows:
         # time, price, ma(50)5m, ma(50)1h, rsi(6)5m, rsi(6)1h, rsi(14)5m, rsi(14)1h
         list_lines = []
@@ -226,10 +228,13 @@ class StandaloneLogger():
         # First check if the folder exists
         # print(list_lines)
         self.buffer_written[curr_index] = True
+        # print(folder_path)
         if not os.path.exists(folder_path):
+            print("Creating path at " + folder_path)
             path = pathlib.Path(folder_path)
             path.mkdir(parents=True)
         # Then either append or write to file as required
+        #print("Got to here")
         with open(filename, "a+") as file:
             for line in list_lines:
                 file.write(line)
