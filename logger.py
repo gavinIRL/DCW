@@ -160,11 +160,12 @@ class StandaloneLogger():
         # Need to grab the appropriate data
         # For example need to have the klines for last 50 5min segments
         # And also the last 50 1hr segments
-        for i, price in enumerate(self.buffer_data[curr_index]):
+        print(self.buffer_data[0])
+        for i, timepoint in enumerate(self.buffer_data):
+            price = timepoint[pair]
             time_entry = self.buffer_times[i]
             data_5min = self.last_50_closes_5min[curr_index]
             data_1hr = self.last_50_closes_1hr[curr_index]
-            print(data_5min)
             ma_50_5min = self.calculate_ma_logger(data_5min, 50)[-1]
             ma_50_1hr = self.calculate_ma_logger(data_1hr, 50)[-1]
             data_5min = self.last_50_closes_5min[curr_index][-16:]
@@ -173,7 +174,6 @@ class StandaloneLogger():
             rsi_6_1hr = self.calculate_rsi_logger(data_1hr, 6)[-1]
             rsi_14_5min = self.calculate_rsi_logger(data_5min, 14)[-1]
             rsi_14_1hr = self.calculate_rsi_logger(data_1hr, 14)[-1]
-            # TBD need to grab volume data and append also
             volume_5m = self.last_50_oohlcvc_5min[curr_index][-1]["Volume"]
             volume_1h = self.last_50_oohlcvc_1hr[curr_index][-1]["Volume"]
             if indicators:
@@ -183,6 +183,29 @@ class StandaloneLogger():
             else:
                 line = time_entry + ","+price + "\n"
             list_lines.append(line)
+        # for i, price in enumerate(self.buffer_data[curr_index]):
+        #     time_entry = self.buffer_times[i]
+        #     data_5min = self.last_50_closes_5min[curr_index]
+        #     data_1hr = self.last_50_closes_1hr[curr_index]
+        #     # print(data_5min)
+        #     ma_50_5min = self.calculate_ma_logger(data_5min, 50)[-1]
+        #     ma_50_1hr = self.calculate_ma_logger(data_1hr, 50)[-1]
+        #     data_5min = self.last_50_closes_5min[curr_index][-16:]
+        #     data_1hr = self.last_50_closes_1hr[curr_index][-16:]
+        #     rsi_6_5min = self.calculate_rsi_logger(data_5min, 6)[-1]
+        #     rsi_6_1hr = self.calculate_rsi_logger(data_1hr, 6)[-1]
+        #     rsi_14_5min = self.calculate_rsi_logger(data_5min, 14)[-1]
+        #     rsi_14_1hr = self.calculate_rsi_logger(data_1hr, 14)[-1]
+        #     # TBD need to grab volume data and append also
+        #     volume_5m = self.last_50_oohlcvc_5min[curr_index][-1]["Volume"]
+        #     volume_1h = self.last_50_oohlcvc_1hr[curr_index][-1]["Volume"]
+        #     if indicators:
+        #         line = time_entry + ","+price + ","+ma_50_5min+","+ma_50_1hr+"," + \
+        #             rsi_6_5min+","+rsi_6_1hr+","+rsi_14_5min+","+rsi_14_1hr + "," + \
+        #             volume_5m+","+volume_1h+"\n"
+        #     else:
+        #         line = time_entry + ","+price + "\n"
+        #     list_lines.append(line)
         # And then write the data to the file
         # First check if the folder exists
         if not os.path.exists(folder_path):
