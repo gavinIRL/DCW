@@ -115,24 +115,31 @@ class StandaloneLogger():
     # Having these methods more visible for clarity
     # And to prevent error of sequence not being a numpy array
     # Because I will retire from programming if I make that error once more
+    @staticmethod
     def calculate_ma_logger(sequence, time_period):
         return ta.MA(np.array(sequence), time_period)
 
+    @staticmethod
     def calculate_ema_logger(sequence, time_period):
         return ta.EMA(np.array(sequence), time_period)
 
+    @staticmethod
     def calculate_mom_logger(sequence, time_period):
         return ta.MOM(np.array(sequence), time_period)
 
+    @staticmethod
     def calculate_trix_logger(sequence, time_period):
         return ta.TRIX(np.array(sequence), time_period)
 
+    @staticmethod
     def calculate_dema_logger(sequence, time_period):
         return ta.DEMA(np.array(sequence), time_period)
 
+    @staticmethod
     def calculate_tema_logger(sequence, time_period):
         return ta.TEMA(np.array(sequence), time_period)
 
+    @staticmethod
     def calculate_rsi_logger(sequence, time_period):
         return ta.RSI(np.array(sequence), time_period)
 
