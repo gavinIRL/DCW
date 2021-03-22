@@ -193,13 +193,13 @@ class StandaloneLogger():
             rsi_6_1hr = str(self.calculate_rsi_logger(data_1hr, 6)[-1])
             rsi_14_5min = str(self.calculate_rsi_logger(data_5min, 14)[-1])
             rsi_14_1hr = str(self.calculate_rsi_logger(data_1hr, 14)[-1])
-            print(self.last_50_oohlcvc_5min)
-            #volume_5m = self.last_50_oohlcvc_5min[curr_index][-1]["Volume"]
-            #volume_1h = self.last_50_oohlcvc_1hr[curr_index][-1]["Volume"]
+            # print(self.last_50_oohlcvc_5min)
+            volume_5m = self.last_50_oohlcvc_5min[curr_index][-1]["Volume"]
+            volume_1h = self.last_50_oohlcvc_1hr[curr_index][-1]["Volume"]
             if indicators:
                 line = time_entry + ","+price + ","+ma_50_5min+","+ma_50_1hr+"," + \
-                    rsi_6_5min+","+rsi_6_1hr+","+rsi_14_5min+","+rsi_14_1hr + "," + "\n"
-                # volume_5m+","+volume_1h+"\n"
+                    rsi_6_5min+","+rsi_6_1hr+","+rsi_14_5min+","+rsi_14_1hr + "," + \
+                    volume_5m+","+volume_1h+"\n"
             else:
                 line = time_entry + ","+price + "\n"
             # line = price + "\n"
@@ -336,7 +336,7 @@ class StandaloneLogger():
         for entry in data5m:
             close_only.append(entry["Close"])
         self.last_50_closes_5min[index] = close_only
-        self.last_50_oohlcvc_5min = data5m.copy()
+        self.last_50_oohlcvc_5min[index] = data5m.copy()
 
     def candle_thread_handler_1hr(self, pair, sleep_timer):
         index = self.pair_list.index(pair)
@@ -348,7 +348,7 @@ class StandaloneLogger():
         for entry in data1h:
             close_only.append(entry["Close"])
         self.last_50_closes_1hr[index] = close_only
-        self.last_50_oohlcvc_1hr = data1h.copy()
+        self.last_50_oohlcvc_1hr[index] = data1h.copy()
 
 
 def main_loop(sl: StandaloneLogger, max_loops=100, sleep_time=2.5):
