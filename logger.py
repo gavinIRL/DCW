@@ -209,19 +209,26 @@ class StandaloneLogger():
             # Only happens at the beginning, or more accurately only matters at beginning
             # Therefore need to pause until information has come through for each currency
             sleep_length = 0.5
-            while not all(self.last_50_closes_5min) and not all(self.last_50_closes_1hr):
+            while not all(self.last_50_closes_1hr):
                 sleep_length += 0.5
                 print("Data not fully loaded yet, sleeping for " +
                       str(sleep_length)+"s total")
                 time.sleep(0.5)
-            # Sleep for another half second anyway to make sure
+            # Sleep for another second anyway to make sure
             if sleep_length > 0.5:
                 print("Data loaded, continuing")
-                time.sleep(0.5)
+                # print(self.last_50_closes_1hr)
+                time.sleep(1.0)
+            # Debug - Check of the last 5 currencies to load
+            # while True:
+            #     print(self.last_50_closes_1hr[:-5])
+            #     time.sleep(1.0)
+            #     if self.log_loop_tracker > 5000:
+            #         break
             # Now update the last value in the last 50 closes
             for pair, price in price_data.items():
                 curr_index = self.pair_list.index(pair)
-                print(curr_index)
+                # print(curr_index)
                 # print(self.last_50_closes_1hr[curr_index][-1])
                 self.last_50_closes_5min[curr_index][-1] = price
                 self.last_50_closes_1hr[curr_index][-1] = price
