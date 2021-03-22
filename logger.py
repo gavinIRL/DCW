@@ -111,6 +111,14 @@ class StandaloneLogger():
         target_date = base_datetime + delta
         return target_date
 
+    def clean_format_time(self, raw_time: str):
+        clean_format_time = str(self.convert_ms_to_datetime_logger(
+            raw_time)).replace("-", "")
+        clean_format_time = clean_format_time.replace(
+            " ", "-").split(".")[0]
+        clean_format_time = clean_format_time.replace(":", "")
+        return clean_format_time
+
     # Having these methods more visible for clarity
     # And to prevent error of sequence not being a numpy array
     # Because I will retire from programming if I make that error once more
