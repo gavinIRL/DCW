@@ -272,7 +272,7 @@ class StandaloneLogger():
                 self.last_50_closes_5min[curr_index][-1] = price
                 self.last_50_closes_1hr[curr_index][-1] = price
             # Then update the buffer data once all written flags are true
-            while all(self.buffer_written):
+            while not all(self.buffer_written):
                 print("Waiting for buffer to finish writing")
                 time.sleep(0.1)
             if self.buffer_counter == 0:
