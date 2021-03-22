@@ -125,7 +125,7 @@ class StandaloneLogger():
         return clean_format_time
 
     # Having these methods more visible for clarity
-    # And to prevent error of sequence not being a numpy array
+    # And to prevent error of sequence not being a numpy array of correct type
     # Because I will retire from programming if I make that error once more
     @staticmethod
     def calculate_ma_logger(sequence, time_period):
@@ -167,15 +167,9 @@ class StandaloneLogger():
         else:
             folder_path = self.path + str(pair) + "\\"
         filename = folder_path + str(filename)
-        # The csv file format should be as follows:
-        # time, price, ma(50)5m, ma(50)1h, rsi(6)5m, rsi(6)1h, rsi(14)5m, rsi(14)1h
+        # The csv file format is listed at top of file
         list_lines = []
         # Need to grab the appropriate data
-        # For example need to have the klines for last 50 5min segments
-        # And also the last 50 1hr segments
-        # print(self.buffer_data[0])
-        # print(self.buffer_times)
-        #print("length of buffertimes = "+str(len(self.buffer_times)))
         for i, timepoint in enumerate(self.buffer_data):
             price = timepoint[pair]
             _, time_entry = str(self.buffer_times[i]).split("-")
@@ -184,7 +178,6 @@ class StandaloneLogger():
             # Edit the final price to be timepoint price
             data_5min[-1] = price
             data_1hr[-1] = price
-            # print(np.array(data_5min))
             ma_50_5min = str(self.calculate_ma_logger(data_5min, 50)[-1])
             ma_50_1hr = str(self.calculate_ma_logger(data_1hr, 50)[-1])
             data_5min = self.last_50_closes_5min[curr_index][-16:]
@@ -193,7 +186,7 @@ class StandaloneLogger():
             rsi_6_1hr = str(self.calculate_rsi_logger(data_1hr, 6)[-1])
             rsi_14_5min = str(self.calculate_rsi_logger(data_5min, 14)[-1])
             rsi_14_1hr = str(self.calculate_rsi_logger(data_1hr, 14)[-1])
-            # print(self.last_50_oohlcvc_5min)
+            # Going to omit volume for now
             #volume_5m = self.last_50_oohlcvc_5min[curr_index][-1]["Volume"]
             #volume_1h = self.last_50_oohlcvc_1hr[curr_index][-1]["Volume"]
             if indicators:
@@ -201,42 +194,16 @@ class StandaloneLogger():
                     rsi_6_5min+","+rsi_6_1hr+","+rsi_14_5min+","+rsi_14_1hr + "," + "\n"
             else:
                 line = time_entry + ","+price + "\n"
-            # line = price + "\n"
             list_lines.append(line)
-        # for i, price in enumerate(self.buffer_data[curr_index]):
-        #     time_entry = self.buffer_times[i]
-        #     data_5min = self.last_50_closes_5min[curr_index]
-        #     data_1hr = self.last_50_closes_1hr[curr_index]
-        #     # print(data_5min)
-        #     ma_50_5min = self.calculate_ma_logger(data_5min, 50)[-1]
-        #     ma_50_1hr = self.calculate_ma_logger(data_1hr, 50)[-1]
-        #     data_5min = self.last_50_closes_5min[curr_index][-16:]
-        #     data_1hr = self.last_50_closes_1hr[curr_index][-16:]
-        #     rsi_6_5min = self.calculate_rsi_logger(data_5min, 6)[-1]
-        #     rsi_6_1hr = self.calculate_rsi_logger(data_1hr, 6)[-1]
-        #     rsi_14_5min = self.calculate_rsi_logger(data_5min, 14)[-1]
-        #     rsi_14_1hr = self.calculate_rsi_logger(data_1hr, 14)[-1]
-        #     # TBD need to grab volume data and append also
-        #     volume_5m = self.last_50_oohlcvc_5min[curr_index][-1]["Volume"]
-        #     volume_1h = self.last_50_oohlcvc_1hr[curr_index][-1]["Volume"]
-        #     if indicators:
-        #         line = time_entry + ","+price + ","+ma_50_5min+","+ma_50_1hr+"," + \
-        #             rsi_6_5min+","+rsi_6_1hr+","+rsi_14_5min+","+rsi_14_1hr + "," + \
-        #             volume_5m+","+volume_1h+"\n"
-        #     else:
-        #         line = time_entry + ","+price + "\n"
-        #     list_lines.append(line)
         # And then write the data to the file
-        # First check if the folder exists
-        # print(list_lines)
+        # First flag that finished with buffer data
         self.buffer_written[curr_index] = True
-        # print(folder_path)
+        # Create folder if necessary at beginning
         if not os.path.exists(folder_path):
             print("Creating path at " + folder_path)
             path = pathlib.Path(folder_path)
             path.mkdir(parents=True)
         # Then either append or write to file as required
-        #print("Got to here")
         with open(filename, "a+") as file:
             for line in list_lines:
                 file.write(line)
