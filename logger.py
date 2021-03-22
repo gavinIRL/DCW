@@ -164,10 +164,10 @@ class StandaloneLogger():
         filename = str(pair)+"-" + str(self.log_start_time)+".csv"
         if folder_path:
             filename = folder_path + str(filename)
-            folder_path = os.getcwd()
+            folder_path = os.getcwd() + "\\" + str(pair) + "\\"
         else:
             filename = self.path + str(filename)
-            folder_path = self.path
+            folder_path = self.path + str(pair) + "\\"
         # The csv file format should be as follows:
         # time, price, ma(50)5m, ma(50)1h, rsi(6)5m, rsi(6)1h, rsi(14)5m, rsi(14)1h
         list_lines = []
