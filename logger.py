@@ -194,12 +194,11 @@ class StandaloneLogger():
             rsi_14_5min = str(self.calculate_rsi_logger(data_5min, 14)[-1])
             rsi_14_1hr = str(self.calculate_rsi_logger(data_1hr, 14)[-1])
             # print(self.last_50_oohlcvc_5min)
-            volume_5m = self.last_50_oohlcvc_5min[curr_index][-1]["Volume"]
-            volume_1h = self.last_50_oohlcvc_1hr[curr_index][-1]["Volume"]
+            #volume_5m = self.last_50_oohlcvc_5min[curr_index][-1]["Volume"]
+            #volume_1h = self.last_50_oohlcvc_1hr[curr_index][-1]["Volume"]
             if indicators:
                 line = time_entry + ","+price + ","+ma_50_5min+","+ma_50_1hr+"," + \
-                    rsi_6_5min+","+rsi_6_1hr+","+rsi_14_5min+","+rsi_14_1hr + "," + \
-                    volume_5m+","+volume_1h+"\n"
+                    rsi_6_5min+","+rsi_6_1hr+","+rsi_14_5min+","+rsi_14_1hr + "," + "\n"
             else:
                 line = time_entry + ","+price + "\n"
             # line = price + "\n"
