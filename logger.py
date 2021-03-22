@@ -129,31 +129,31 @@ class StandaloneLogger():
     # Because I will retire from programming if I make that error once more
     @staticmethod
     def calculate_ma_logger(sequence, time_period):
-        return ta.MA(np.array(sequence, dtype=np.float32), time_period)
+        return ta.MA(np.array(sequence, dtype=np.float64), time_period)
 
     @staticmethod
     def calculate_ema_logger(sequence, time_period):
-        return ta.EMA(np.array(sequence, dtype=np.float32), time_period)
+        return ta.EMA(np.array(sequence, dtype=np.float64), time_period)
 
     @staticmethod
     def calculate_mom_logger(sequence, time_period):
-        return ta.MOM(np.array(sequence, dtype=np.float32), time_period)
+        return ta.MOM(np.array(sequence, dtype=np.float64), time_period)
 
     @staticmethod
     def calculate_trix_logger(sequence, time_period):
-        return ta.TRIX(np.array(sequence, dtype=np.float32), time_period)
+        return ta.TRIX(np.array(sequence, dtype=np.float64), time_period)
 
     @staticmethod
     def calculate_dema_logger(sequence, time_period):
-        return ta.DEMA(np.array(sequence, dtype=np.float32), time_period)
+        return ta.DEMA(np.array(sequence, dtype=np.float64), time_period)
 
     @staticmethod
     def calculate_tema_logger(sequence, time_period):
-        return ta.TEMA(np.array(sequence, dtype=np.float32), time_period)
+        return ta.TEMA(np.array(sequence, dtype=np.float64), time_period)
 
     @staticmethod
     def calculate_rsi_logger(sequence, time_period):
-        return ta.RSI(np.array(sequence, dtype=np.float32), time_period)
+        return ta.RSI(np.array(sequence, dtype=np.float64), time_period)
 
     def csv_writer_thread_handler(self, curr_index, folder_path, indicators=True):
         # This will calculate the rsi and ma values for a given currency
@@ -178,27 +178,31 @@ class StandaloneLogger():
         #print("length of buffertimes = "+str(len(self.buffer_times)))
         for i, timepoint in enumerate(self.buffer_data):
             price = timepoint[pair]
-            time_entry = self.buffer_times[i]
+            _, time_entry = str(self.buffer_times[i]).split("-")
             data_5min = self.last_50_closes_5min[curr_index]
             data_1hr = self.last_50_closes_1hr[curr_index]
+            # Edit the final price to be timepoint price
+            data_5min[-1] = price
+            data_1hr[-1] = price
             # print(np.array(data_5min))
-            # ma_50_5min = self.calculate_ma_logger(data_5min, 50)[-1]
-            # ma_50_1hr = self.calculate_ma_logger(data_1hr, 50)[-1]
-            # data_5min = self.last_50_closes_5min[curr_index][-16:]
-            # data_1hr = self.last_50_closes_1hr[curr_index][-16:]
-            # rsi_6_5min = self.calculate_rsi_logger(data_5min, 6)[-1]
-            # rsi_6_1hr = self.calculate_rsi_logger(data_1hr, 6)[-1]
-            # rsi_14_5min = self.calculate_rsi_logger(data_5min, 14)[-1]
-            # rsi_14_1hr = self.calculate_rsi_logger(data_1hr, 14)[-1]
-            # volume_5m = self.last_50_oohlcvc_5min[curr_index][-1]["Volume"]
-            # volume_1h = self.last_50_oohlcvc_1hr[curr_index][-1]["Volume"]
-            # if indicators:
-            #     line = time_entry + ","+price + ","+ma_50_5min+","+ma_50_1hr+"," + \
-            #         rsi_6_5min+","+rsi_6_1hr+","+rsi_14_5min+","+rsi_14_1hr + "," + \
-            #         volume_5m+","+volume_1h+"\n"
-            # else:
-            #     line = time_entry + ","+price + "\n"
-            line = price + "\n"
+            ma_50_5min = str(self.calculate_ma_logger(data_5min, 50)[-1])
+            ma_50_1hr = str(self.calculate_ma_logger(data_1hr, 50)[-1])
+            data_5min = self.last_50_closes_5min[curr_index][-16:]
+            data_1hr = self.last_50_closes_1hr[curr_index][-16:]
+            rsi_6_5min = str(self.calculate_rsi_logger(data_5min, 6)[-1])
+            rsi_6_1hr = str(self.calculate_rsi_logger(data_1hr, 6)[-1])
+            rsi_14_5min = str(self.calculate_rsi_logger(data_5min, 14)[-1])
+            rsi_14_1hr = str(self.calculate_rsi_logger(data_1hr, 14)[-1])
+            print(self.last_50_oohlcvc_5min)
+            #volume_5m = self.last_50_oohlcvc_5min[curr_index][-1]["Volume"]
+            #volume_1h = self.last_50_oohlcvc_1hr[curr_index][-1]["Volume"]
+            if indicators:
+                line = time_entry + ","+price + ","+ma_50_5min+","+ma_50_1hr+"," + \
+                    rsi_6_5min+","+rsi_6_1hr+","+rsi_14_5min+","+rsi_14_1hr + "," + "\n"
+                # volume_5m+","+volume_1h+"\n"
+            else:
+                line = time_entry + ","+price + "\n"
+            # line = price + "\n"
             list_lines.append(line)
         # for i, price in enumerate(self.buffer_data[curr_index]):
         #     time_entry = self.buffer_times[i]
@@ -277,7 +281,7 @@ class StandaloneLogger():
                 self.last_50_closes_1hr[curr_index][-1] = price
             # Then update the buffer data once all written flags are true
             while not all(self.buffer_written):
-                print("Waiting for buffer to finish writing")
+                #print("Waiting for buffer to finish writing")
                 time.sleep(0.1)
             if self.buffer_counter == 0:
                 self.buffer_times = []
