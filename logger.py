@@ -25,7 +25,7 @@ class StandaloneLogger():
         self.candle_loop_tracker = 1
         self.buffer_counter = 1
         self.fresh_prices = []
-        self.log_start_time = []
+        self.log_start_time = 0
         self.file_list = []
         self.buffer_times = []
         self.buffer_data = []
@@ -35,7 +35,6 @@ class StandaloneLogger():
         self.last_50_oohlcvc_1hr = []
         for i in range(len(self.pair_list)):
             self.fresh_prices.append(1.2)
-            self.log_start_time.append(0)
             self.file_list.append(".")
             self.last_50_closes_5min.append([])
             self.last_50_closes_1hr.append([])
@@ -117,31 +116,31 @@ class StandaloneLogger():
     # Because I will retire from programming if I make that error once more
     @staticmethod
     def calculate_ma_logger(sequence, time_period):
-        return ta.MA(np.array(sequence), time_period)
+        return ta.MA(np.array(sequence, dtype=np.float32), time_period)
 
     @staticmethod
     def calculate_ema_logger(sequence, time_period):
-        return ta.EMA(np.array(sequence), time_period)
+        return ta.EMA(np.array(sequence, dtype=np.float32), time_period)
 
     @staticmethod
     def calculate_mom_logger(sequence, time_period):
-        return ta.MOM(np.array(sequence), time_period)
+        return ta.MOM(np.array(sequence, dtype=np.float32), time_period)
 
     @staticmethod
     def calculate_trix_logger(sequence, time_period):
-        return ta.TRIX(np.array(sequence), time_period)
+        return ta.TRIX(np.array(sequence, dtype=np.float32), time_period)
 
     @staticmethod
     def calculate_dema_logger(sequence, time_period):
-        return ta.DEMA(np.array(sequence), time_period)
+        return ta.DEMA(np.array(sequence, dtype=np.float32), time_period)
 
     @staticmethod
     def calculate_tema_logger(sequence, time_period):
-        return ta.TEMA(np.array(sequence), time_period)
+        return ta.TEMA(np.array(sequence, dtype=np.float32), time_period)
 
     @staticmethod
     def calculate_rsi_logger(sequence, time_period):
-        return ta.RSI(np.array(sequence), time_period)
+        return ta.RSI(np.array(sequence, dtype=np.float32), time_period)
 
     def csv_writer_thread_handler(self, curr_index, folder_path, indicators=True):
         # This will calculate the rsi and ma values for a given currency
@@ -160,28 +159,30 @@ class StandaloneLogger():
         # Need to grab the appropriate data
         # For example need to have the klines for last 50 5min segments
         # And also the last 50 1hr segments
-        print(self.buffer_data[0])
+        # print(self.buffer_data[0])
         for i, timepoint in enumerate(self.buffer_data):
             price = timepoint[pair]
             time_entry = self.buffer_times[i]
             data_5min = self.last_50_closes_5min[curr_index]
             data_1hr = self.last_50_closes_1hr[curr_index]
-            ma_50_5min = self.calculate_ma_logger(data_5min, 50)[-1]
-            ma_50_1hr = self.calculate_ma_logger(data_1hr, 50)[-1]
-            data_5min = self.last_50_closes_5min[curr_index][-16:]
-            data_1hr = self.last_50_closes_1hr[curr_index][-16:]
-            rsi_6_5min = self.calculate_rsi_logger(data_5min, 6)[-1]
-            rsi_6_1hr = self.calculate_rsi_logger(data_1hr, 6)[-1]
-            rsi_14_5min = self.calculate_rsi_logger(data_5min, 14)[-1]
-            rsi_14_1hr = self.calculate_rsi_logger(data_1hr, 14)[-1]
-            volume_5m = self.last_50_oohlcvc_5min[curr_index][-1]["Volume"]
-            volume_1h = self.last_50_oohlcvc_1hr[curr_index][-1]["Volume"]
-            if indicators:
-                line = time_entry + ","+price + ","+ma_50_5min+","+ma_50_1hr+"," + \
-                    rsi_6_5min+","+rsi_6_1hr+","+rsi_14_5min+","+rsi_14_1hr + "," + \
-                    volume_5m+","+volume_1h+"\n"
-            else:
-                line = time_entry + ","+price + "\n"
+            print(np.array(data_5min))
+            # ma_50_5min = self.calculate_ma_logger(data_5min, 50)[-1]
+            # ma_50_1hr = self.calculate_ma_logger(data_1hr, 50)[-1]
+            # data_5min = self.last_50_closes_5min[curr_index][-16:]
+            # data_1hr = self.last_50_closes_1hr[curr_index][-16:]
+            # rsi_6_5min = self.calculate_rsi_logger(data_5min, 6)[-1]
+            # rsi_6_1hr = self.calculate_rsi_logger(data_1hr, 6)[-1]
+            # rsi_14_5min = self.calculate_rsi_logger(data_5min, 14)[-1]
+            # rsi_14_1hr = self.calculate_rsi_logger(data_1hr, 14)[-1]
+            # volume_5m = self.last_50_oohlcvc_5min[curr_index][-1]["Volume"]
+            # volume_1h = self.last_50_oohlcvc_1hr[curr_index][-1]["Volume"]
+            # if indicators:
+            #     line = time_entry + ","+price + ","+ma_50_5min+","+ma_50_1hr+"," + \
+            #         rsi_6_5min+","+rsi_6_1hr+","+rsi_14_5min+","+rsi_14_1hr + "," + \
+            #         volume_5m+","+volume_1h+"\n"
+            # else:
+            #     line = time_entry + ","+price + "\n"
+            line = price
             list_lines.append(line)
         # for i, price in enumerate(self.buffer_data[curr_index]):
         #     time_entry = self.buffer_times[i]
@@ -248,7 +249,7 @@ class StandaloneLogger():
             if sleep_length > 0.5:
                 print("Data loaded, continuing")
                 # print(self.last_50_closes_1hr)
-                time.sleep(1.0)
+                # time.sleep(1.0)
             # Debug - Check of the last 5 currencies to load
             # while True:
             #     print(self.last_50_closes_1hr[:-5])
@@ -347,7 +348,14 @@ def main_loop(sl: StandaloneLogger, max_loops=100, sleep_time=2.5):
             sl.candle_loop_tracker = 1
         else:
             sl.candle_loop_tracker += 1
-
+        if sl.log_start_time == 0:
+            current_time = time.time()
+            clean_format_time = str(sl.convert_ms_to_datetime_logger(
+                current_time)).replace("-", "")
+            clean_format_time = clean_format_time.replace(
+                " ", "-").split(".")[0]
+            clean_format_time = clean_format_time.replace(":", "")
+            sl.log_start_time = clean_format_time
         sl.csv_logger_lightweight()
         sl.log_loop_tracker += 1
         time.sleep(sleep_time)
