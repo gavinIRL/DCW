@@ -11,6 +11,7 @@ import requests
 import talib as ta
 import numpy as np
 import threading
+import pathlib
 
 
 class StandaloneLogger():
@@ -226,18 +227,12 @@ class StandaloneLogger():
         # print(list_lines)
         self.buffer_written[curr_index] = True
         if not os.path.exists(folder_path):
-            os.mkdir(folder_path)
-        # Then check if the file already exists and then either append or write as required
-        # Check if file already exists
-        if not os.path.isfile(filename):
-            with open(filename, "w") as file:
-                for line in list_lines:
-                    file.write(line)
-        # Otherwise append
-        else:
-            with open(filename, "a") as file:
-                for line in list_lines:
-                    file.write(line)
+            path = pathlib.Path(folder_path)
+            path.mkdir(parents=True)
+        # Then either append or write to file as required
+        with open(filename, "a+") as file:
+            for line in list_lines:
+                file.write(line)
 
     def csv_logger_lightweight(self, path=False):
         # print("Got here #1")
