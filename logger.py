@@ -33,6 +33,9 @@ class StandaloneLogger():
         self.last_50_closes_1hr = []
         self.last_50_oohlcvc_5min = []
         self.last_50_oohlcvc_1hr = []
+
+        # This is for ensuring buffer data has been written
+        self.buffer_written = []
         for i in range(len(self.pair_list)):
             self.fresh_prices.append(1.2)
             self.file_list.append(".")
@@ -40,6 +43,7 @@ class StandaloneLogger():
             self.last_50_closes_1hr.append([])
             self.last_50_oohlcvc_5min.append([])
             self.last_50_oohlcvc_1hr.append([])
+            self.buffer_written.append(True)
 
         self.current_timeout = 0
         self.threads = []
@@ -168,12 +172,14 @@ class StandaloneLogger():
         # For example need to have the klines for last 50 5min segments
         # And also the last 50 1hr segments
         # print(self.buffer_data[0])
+        # print(self.buffer_times)
+        #print("length of buffertimes = "+str(len(self.buffer_times)))
         for i, timepoint in enumerate(self.buffer_data):
             price = timepoint[pair]
             time_entry = self.buffer_times[i]
             data_5min = self.last_50_closes_5min[curr_index]
             data_1hr = self.last_50_closes_1hr[curr_index]
-            print(np.array(data_5min))
+            # print(np.array(data_5min))
             # ma_50_5min = self.calculate_ma_logger(data_5min, 50)[-1]
             # ma_50_1hr = self.calculate_ma_logger(data_1hr, 50)[-1]
             # data_5min = self.last_50_closes_5min[curr_index][-16:]
@@ -217,6 +223,8 @@ class StandaloneLogger():
         #     list_lines.append(line)
         # And then write the data to the file
         # First check if the folder exists
+        # print(list_lines)
+        self.buffer_written[curr_index] = True
         if not os.path.exists(folder_path):
             os.mkdir(folder_path)
         # Then check if the file already exists and then either append or write as required
@@ -273,7 +281,9 @@ class StandaloneLogger():
             self.buffer_data.append(price_data)
             # Then write to the files every time 10 ticks are saved up
             if self.buffer_counter >= self.buffer_size:
-                # print("Got here #2")
+                # Turn the buffer written flags to false
+                for i, pair in enumerate(self.pair_list):
+                    self.buffer_written[i] = False
                 self.buffer_counter = 0
                 # Send information to the threaded tasks
                 for i, currency in enumerate(self.pair_list):
@@ -283,6 +293,7 @@ class StandaloneLogger():
                                          args=(i, path))
                     self.threads.append(t)
                     t.start()
+                # Need to delay clearing buffers
                 self.buffer_times = []
                 self.buffer_data = []
             else:
