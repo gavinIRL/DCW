@@ -276,7 +276,13 @@ class StandaloneLogger():
                 # print(self.last_50_closes_1hr[curr_index][-1])
                 self.last_50_closes_5min[curr_index][-1] = price
                 self.last_50_closes_1hr[curr_index][-1] = price
-            # Then update the buffer data
+            # Then update the buffer data once all written flags are true
+            while all(self.buffer_written):
+                print("Waiting for buffer to finish writing")
+                time.sleep(0.1)
+            if self.buffer_counter == 0:
+                self.buffer_times = []
+                self.buffer_data = []
             self.buffer_times.append(clean_format_time)
             self.buffer_data.append(price_data)
             # Then write to the files every time 10 ticks are saved up
@@ -293,9 +299,6 @@ class StandaloneLogger():
                                          args=(i, path))
                     self.threads.append(t)
                     t.start()
-                # Need to delay clearing buffers
-                self.buffer_times = []
-                self.buffer_data = []
             else:
                 self.buffer_counter += 1
         else:
