@@ -15,11 +15,13 @@ import pathlib
 
 
 class StandaloneLogger():
-    def __init__(self, output_path="C:\\DCWLog\\Test\\", buffer_size=20, candle_loop_size=50):
+    def __init__(self, output_path="C:\\DCWLog\\Test\\", buffer_size=20, candle_loop_size=50, verbose=False):
         # Primary controlling object variables first
         self.path = output_path
         self.buffer_size = buffer_size
         self.candle_loop_size = candle_loop_size
+        self.verbose = verbose
+        self.loop_printout_freq = 100
         self.sleep_spacing_mult = 0.25
         self.pair_list = [
             "BTCUSDT", "ETHUSDT", "ADAUSDT", "BNBUSDT", "DOTUSDT", "XRPUSDT", "LTCUSDT", "XLMUSDT",
@@ -226,12 +228,14 @@ class StandaloneLogger():
             sleep_length = 1.0
             while not all(self.last_50_closes_1hr):
                 sleep_length += 1.0
-                print("Data not fully loaded yet, sleeping for " +
-                      str(sleep_length)+"s total")
+                if self.verbose:
+                    print("Data not fully loaded yet, sleeping for " +
+                          str(sleep_length)+"s total")
                 time.sleep(1.0)
             # Sleep for another second anyway to make sure
             if sleep_length > 1.0:
-                print("Data loaded in "+str(sleep_length)+"s")
+                if self.verbose:
+                    print("Data loaded in "+str(sleep_length)+"s")
             # Now update the last value in the last 50 closes
             for pair, price in price_data.items():
                 curr_index = self.pair_list.index(pair)
@@ -331,6 +335,8 @@ def main_loop(sl: StandaloneLogger, max_loops=100, sleep_time=2.5):
             current_time = time.time()
             sl.log_start_time = sl.clean_format_time(current_time)
         sl.csv_logger_lightweight()
+        if sl.verbose and sl.log_loop_tracker % sl.loop_printout_freq == 0:
+            print("Completed loop #"+str(sl.log_loop_tracker)+" of "+str(max_loops))
         sl.log_loop_tracker += 1
         time.sleep(sleep_time)
 
