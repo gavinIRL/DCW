@@ -205,7 +205,6 @@ class StandaloneLogger():
         self.buffer_written[curr_index] = True
         # Create folder if necessary at beginning
         if not os.path.exists(folder_path):
-            print("Creating path at " + folder_path)
             path = pathlib.Path(folder_path)
             path.mkdir(parents=True)
         # Then either append or write to file as required
@@ -236,8 +235,6 @@ class StandaloneLogger():
             # Now update the last value in the last 50 closes
             for pair, price in price_data.items():
                 curr_index = self.pair_list.index(pair)
-                # print(curr_index)
-                # print(self.last_50_closes_1hr[curr_index][-1])
                 self.last_50_closes_5min[curr_index][-1] = price
                 self.last_50_closes_1hr[curr_index][-1] = price
             # Then update the buffer data once all written flags are true
@@ -255,7 +252,7 @@ class StandaloneLogger():
                     self.buffer_written[i] = False
                 self.buffer_counter = 0
                 # Send information to the threaded tasks
-                for i, currency in enumerate(self.pair_list):
+                for i, _ in enumerate(self.pair_list):
                     # Do something
                     t = threading.Thread(target=self.csv_writer_thread_handler,
                                          args=(i, path))
