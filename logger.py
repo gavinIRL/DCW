@@ -214,35 +214,25 @@ class StandaloneLogger():
                 file.write(line)
 
     def csv_logger_lightweight(self, path=False):
-        # print("Got here #1")
         # First grab the current time
         current_time = time.time()
         clean_format_time = self.clean_format_time(current_time)
         # Now grab the current prices
         price_data = self.get_tick_logger(self.pair_list)
-        # print(price_data)
         # Check that there wasn't an error
         if price_data:
             # Run into a problem of not all threads being complete when get to this point unfortunately
             # Only happens at the beginning, or more accurately only matters at beginning
             # Therefore need to pause until information has come through for each currency
-            sleep_length = 0.5
+            sleep_length = 1.0
             while not all(self.last_50_closes_1hr):
-                sleep_length += 0.5
+                sleep_length += 1.0
                 print("Data not fully loaded yet, sleeping for " +
                       str(sleep_length)+"s total")
-                time.sleep(0.5)
+                time.sleep(1.0)
             # Sleep for another second anyway to make sure
-            if sleep_length > 0.5:
-                print("Data loaded, continuing")
-                # print(self.last_50_closes_1hr)
-                # time.sleep(1.0)
-            # Debug - Check of the last 5 currencies to load
-            # while True:
-            #     print(self.last_50_closes_1hr[:-5])
-            #     time.sleep(1.0)
-            #     if self.log_loop_tracker > 5000:
-            #         break
+            if sleep_length > 1.0:
+                print("Data loaded in "+str(sleep_length)+"s")
             # Now update the last value in the last 50 closes
             for pair, price in price_data.items():
                 curr_index = self.pair_list.index(pair)
@@ -252,7 +242,6 @@ class StandaloneLogger():
                 self.last_50_closes_1hr[curr_index][-1] = price
             # Then update the buffer data once all written flags are true
             while not all(self.buffer_written):
-                #print("Waiting for buffer to finish writing")
                 time.sleep(0.1)
             if self.buffer_counter == 0:
                 self.buffer_times = []
@@ -268,7 +257,6 @@ class StandaloneLogger():
                 # Send information to the threaded tasks
                 for i, currency in enumerate(self.pair_list):
                     # Do something
-                    # print("Got here #3")
                     t = threading.Thread(target=self.csv_writer_thread_handler,
                                          args=(i, path))
                     self.threads.append(t)
