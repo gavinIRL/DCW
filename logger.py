@@ -341,5 +341,5 @@ def main_loop(sl: StandaloneLogger, max_loops=100, sleep_time=2.5):
 
 
 if __name__ == "__main__":
-    sl = StandaloneLogger(buffer_size=5)
-    main_loop(sl)
+    sl = StandaloneLogger()
+    main_loop(sl, max_loops=5000)
