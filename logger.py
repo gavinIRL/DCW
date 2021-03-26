@@ -341,6 +341,9 @@ def main_loop(sl: StandaloneLogger, max_loops=100, sleep_time=2.5, max_filesize=
         # Check if a new file needs to be started
         if sl.log_loop_tracker % max_filesize == 0:
             sl.log_start_time = 0
+            if sl.verbose:
+                print("Starting new file, max filesize of " +
+                      str(max_filesize)+" reached")
         time.sleep(sleep_time)
 
 
