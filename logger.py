@@ -340,6 +340,8 @@ def main_loop(sl: StandaloneLogger, max_loops=100, sleep_time=2.5):
         time.sleep(sleep_time)
 
 
+# loops and durations
+# 1hr = 1440, 24hr = 34560
 if __name__ == "__main__":
     sl = StandaloneLogger()
-    main_loop(sl, max_loops=5000)
+    main_loop(sl, max_loops=34560)
