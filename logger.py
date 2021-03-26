@@ -310,7 +310,7 @@ class StandaloneLogger():
         self.last_50_oohlcvc_1hr[index] = data1h.copy()
 
 
-def main_loop(sl: StandaloneLogger, max_loops=100, sleep_time=2.5):
+def main_loop(sl: StandaloneLogger, max_loops=100, sleep_time=2.5, max_filesize=7200):
     while sl.log_loop_tracker < max_loops:
         # Need to grab the candles every so often
         if sl.candle_loop_tracker == 1:
@@ -333,15 +333,19 @@ def main_loop(sl: StandaloneLogger, max_loops=100, sleep_time=2.5):
         if sl.log_start_time == 0:
             current_time = time.time()
             sl.log_start_time = sl.clean_format_time(current_time)
+        # Update the prices and write to file if required
         sl.csv_logger_lightweight()
         if sl.verbose and sl.log_loop_tracker % sl.loop_printout_freq == 0:
             print("Completed loop #"+str(sl.log_loop_tracker)+" of "+str(max_loops))
         sl.log_loop_tracker += 1
+        # Check if a new file needs to be started
+        if sl.log_loop_tracker % max_filesize == 0:
+            sl.log_start_time = 0
         time.sleep(sleep_time)
 
 
 # loops and durations
-# 1hr = 1440, 24hr = 34560
+# 1hr = 1440, 3hr = 4320, 24hr = 34560
 if __name__ == "__main__":
     sl = StandaloneLogger()
     main_loop(sl, max_loops=34560)
