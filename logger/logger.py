@@ -1,6 +1,6 @@
 # This is meant as a standalone logging script for creating bot training datasets
 # The final csv file format should be as follows:
-# time ms, price, ma(50)5m, ma(50)1h, rsi(6)5m, rsi(6)1h, rsi(14)5m, rsi(14)1h
+# time hh:mm:ss, price, ma(50)5m, ma(50)1h, rsi(6)5m, rsi(6)1h, rsi(14)5m, rsi(14)1h
 import time
 import datetime
 import os
