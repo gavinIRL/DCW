@@ -264,7 +264,7 @@ class StandaloneLogger():
             else:
                 self.buffer_counter += 1
         else:
-            time.sleep(sl.current_timeout)
+            time.sleep(self.current_timeout)
 
     def get_candle(self, pair: str, interval: str, limit: int):
         data = self.request_api_logger(
@@ -290,7 +290,7 @@ class StandaloneLogger():
         if self.current_timeout != 0:
             time.sleep(self.current_timeout)
         time.sleep(sleep_timer*self.sleep_spacing_mult)
-        data5m = sl.get_candle(pair, "5m", limit=50)
+        data5m = self.get_candle(pair, "5m", limit=50)
         close_only = []
         for entry in data5m:
             close_only.append(entry["Close"])
@@ -302,7 +302,7 @@ class StandaloneLogger():
         if self.current_timeout != 0:
             time.sleep(self.current_timeout)
         time.sleep(sleep_timer*self.sleep_spacing_mult*1.5)
-        data1h = sl.get_candle(pair, "1h", limit=50)
+        data1h = self.get_candle(pair, "1h", limit=50)
         close_only = []
         for entry in data1h:
             close_only.append(entry["Close"])
@@ -310,7 +310,7 @@ class StandaloneLogger():
         self.last_50_oohlcvc_1hr[index] = data1h.copy()
 
 
-def main_loop(sl: StandaloneLogger, max_loops=100, sleep_time=2.5, max_filesize=7200):
+def main_loop(sl: StandaloneLogger, max_loops=100, sleep_time=2.5, max_filesize=3600):
     while sl.log_loop_tracker < max_loops:
         # Need to grab the candles every so often
         if sl.candle_loop_tracker == 1:
@@ -350,5 +350,4 @@ def main_loop(sl: StandaloneLogger, max_loops=100, sleep_time=2.5, max_filesize=
 # loops and durations
 # 1hr = 1440, 3hr = 4320, 24hr = 34560
 if __name__ == "__main__":
-    sl = StandaloneLogger()
-    main_loop(sl, max_loops=34560)
+    main_loop(StandaloneLogger(), max_loops=7200)
