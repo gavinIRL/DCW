@@ -12,6 +12,7 @@ import random
 class BotEvaluator():
     def __init__(self) -> None:
         self.data_for_eval = []
+        self.starting_price = 0
 
     def grab_historical_data(self):
         list_filenames = []
@@ -24,7 +25,11 @@ class BotEvaluator():
         with open(mypath+random.choice(list_filenames)) as csv_file:
             reader = csv.reader(csv_file)
             self.data_for_eval = list(reader)
-        print(self.data_for_eval)
+        # The csv file format is as follows:
+        # time hh:mm:ss, price, ma(50)5m, ma(50)1h, rsi(6)5m, rsi(6)1h, rsi(14)5m, rsi(14)1h
+        # print(len(self.data_for_eval))
+        self.starting_price = self.data_for_eval[0][1]
+        print(self.starting_price)
 
     def calculate_buy_sell(self):
         pass
