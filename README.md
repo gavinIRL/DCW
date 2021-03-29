@@ -1,6 +1,8 @@
 # DCW
 DesktopCryptoWatcher - Basic desktop GUI to pull and store data from public API(s) and create and evaluate ping-pong trading bots.
 
+Status: Temporarily halted in favour of gaining some experience with bots/automation on my RHBot project, and also in the meantime leaving the logger to run to collect some more data.
+
 Note: This is a simple application for my own personal use, and I'm using this mostly as a learning opporunity. I wanted to create my own application from scratch instead of using existing wrappers or software. I'll probably keep this ticking over in the background with small feature additions once the basic functionality has been implemented, but this isn't really intended for use by anyone else right now (although this may change).
 
 ## Implemented features:
